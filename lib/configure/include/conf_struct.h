@@ -16,20 +16,64 @@
 
 namespace configure {
 
-struct conf_struct {
-	std::string key;
-	std::string value;
-	int value_num;
-	int value_iter;
-	struct conf_struct* child;
-	struct conf_struct* brother;
-	conf_struct() {
-		child = NULL;
-		brother = NULL;
+class ConfStruct {
+public:
+	ConfStruct();
+	~ConfStruct();
+	//ConfStruct* operater[](int iter);
+	//ConfStruct* operater[](const char* iter);
+
+	std::string get_key() const {
+		return _key;
+	};
+	void set_key(const char* key_in) {
+		_key.clear();
+		_key.append(key_in);
 	}
+
+	std::string get_value() const {
+		return _value;
+	};
+	void set_value(const char* value_in) {
+		_value.clear();
+		_value.append(value_in);
+	}
+	
+	ConfStruct* get_child() const {
+		return _child;
+	};
+	void set_child(ConfStruct* p_child) {
+		_child = p_child;
+	};
+
+	ConfStruct* get_brother() const {
+		return _brother;
+	};
+	void set_brother(ConfStruct* p_brother) {
+		_brother = p_brother;
+	};
+
+	ConfStruct* get_father() const {
+		return _father;
+	};
+	void set_father(ConfStruct* p_father) {
+		_father = p_father;
+	};
+
+	bool add_to_tree();
+	ConfStruct* get_last_child() const;
+
+private:
+	std::string _key;
+	std::string _value;
+	int _value_num;
+	int _value_icnt;
+	ConfStruct* _child;
+	ConfStruct* _brother;
+	ConfStruct* _father;
 };
 
-typedef struct conf_struct conf_item;
+typedef ConfStruct conf_item;
 
 };
 

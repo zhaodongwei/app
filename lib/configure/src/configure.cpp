@@ -41,6 +41,7 @@ Configure::~Configure() {
 
 int Configure::_parse() {
 	_root = new conf_item;
+	_root->set_key("root");
 	char line[1024];
 	char token[1024];
 	const char* iter = line;
@@ -48,14 +49,16 @@ int Configure::_parse() {
 		iter = line;
 		fprintf(stdout, "%s", line);
 		conf_item* item = new conf_item;
+		item->set_father(_root);
+		item->add_to_tree();
 		_parse_key(iter, token);
-		item->key.append(token);
-		fprintf(stdout, "key: -->%s<--\n", item->key.c_str());
+		item->set_key(token);
+		fprintf(stdout, "key: -->%s<--\n", item->get_key().c_str());
 		_parse_split(iter, token);
 		fprintf(stdout, "split: -->%s<--\n", token);
 		_parse_value(iter, token);
-		item->value.append(token);
-		fprintf(stdout, "value: -->%s<--\n", item->value.c_str());
+		item->set_value(token);
+		fprintf(stdout, "value: -->%s<--\n", item->get_value().c_str());
 	}
 };
 
@@ -114,12 +117,6 @@ int Configure::_parse_value(const char*& src, char* token) {
 int Configure::_release(conf_item* conf_tree) {
 	if (NULL == conf_tree) {
 		return 0;
-	}
-	if (NULL != conf_tree->child) {
-		_release(conf_tree->child);
-	}
-	if (NULL != conf_tree->brother) {
-		_release(conf_tree->brother);
 	}
 	delete conf_tree;
 	conf_tree = NULL;

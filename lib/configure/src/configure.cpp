@@ -4,7 +4,7 @@
  * 
  * file: configure.cpp
  * date: 2012-11-19
- * desc: main function of configure
+ * desc: main implementation of configure
  ***********************************************************/
 
 #include <stdio.h>
@@ -47,12 +47,15 @@ int Configure::_parse() {
 	while(NULL != fgets(line, 1024, _fs)) {
 		iter = line;
 		fprintf(stdout, "%s", line);
+		conf_item* item = new conf_item;
 		_parse_key(iter, token);
-		fprintf(stdout, "key: -->%s<--\n", &token[0]);
+		item->key.append(token);
+		fprintf(stdout, "key: -->%s<--\n", item->key.c_str());
 		_parse_split(iter, token);
-		fprintf(stdout, "split: -->%s<--\n", &token[0]);
+		fprintf(stdout, "split: -->%s<--\n", token);
 		_parse_value(iter, token);
-		fprintf(stdout, "value: -->%s<--\n", &token[0]);
+		item->value.append(token);
+		fprintf(stdout, "value: -->%s<--\n", item->value.c_str());
 	}
 };
 

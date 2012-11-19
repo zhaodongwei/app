@@ -9,27 +9,26 @@
 
 #include <stdio.h>
 
-#include "tools.h"
 #include "configure.h"
 
 namespace configure {
 
 Configure::Configure(const char* conf_file) {
-	tools::ScopeFile sf(conf_file, "r");
-	_fs = sf.get_ptr();
+	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
 	}
-	root = NULL;
+	_root = NULL;
+	_parse();
 };
 
 Configure::Configure(const std::string& conf_file) {
-	tools::ScopeFile sf(conf_file.c_str(), "r");
-	_fs = sf.get_ptr();
+	_fs = fopen(conf_file.c_str(), "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
 	}
-	root = NULL;
+	_root = NULL;
+	_parse();
 };
 
 Configure::~Configure() {
@@ -37,38 +36,87 @@ Configure::~Configure() {
 		fclose(_fs);
 	}
 	_fs = NULL;
-	release(root);
+	_release(_root);
 };
 
-int Configure::parse() {
-	root = new conf_item;
+int Configure::_parse() {
+	_root = new conf_item;
 	char line[1024];
 	char token[1024];
-	char* iter = line;
+	const char* iter = line;
 	while(NULL != fgets(line, 1024, _fs)) {
 		iter = line;
-		int ret = get_token(iter, token);
+		fprintf(stdout, "%s", line);
+		_parse_key(iter, token);
+		fprintf(stdout, "key: -->%s<--\n", &token[0]);
+		_parse_split(iter, token);
+		fprintf(stdout, "split: -->%s<--\n", &token[0]);
+		_parse_value(iter, token);
+		fprintf(stdout, "value: -->%s<--\n", &token[0]);
 	}
 };
 
-int Configure::get_token(char* src, char* token) {
-	while (*src == " " || *src == "\t") {
+int Configure::_parse_key(const char*& src, char* token) {
+	if (NULL == src || NULL == token) {
+		return -1;
+	}
+	while (*src == ' ' || *src == '\t') {
 		src++;
 	}
-	if (*src == "\n") {
-		return 0;
+	int ret = 0;
+	while (is_alpha_number(src) && *src != '\n' 
+			&& *src != ' ' && *src != '\t') {
+		token[ret] = *src;
+		src++;
+		ret++;
 	}
+	token[ret] = 0;
+	return ret;
 };
 
-int Configure::release(conf_item* conf_tree) {
+int Configure::_parse_split(const char*& src, char* token) {
+	if (NULL == src || NULL == token) {
+		return -1;
+	}
+	while (*src == ' ' || *src == '\t') {
+		src++;
+	}
+	int ret = 0;
+	while (*src == ':') {
+		token[ret] = *src;
+		src++;
+		ret++;
+	}
+	token[ret] = 0;
+	return ret;
+};
+
+int Configure::_parse_value(const char*& src, char* token) {
+	if (NULL == src || NULL == token) {
+		return -1;
+	}
+	while (*src == ' ' || *src == '\t') {
+		src++;
+	}
+	int ret = 0;
+	while (*src != '\n') {
+		token[ret] = *src;
+		src++;
+		ret++;
+	}
+	token[ret] = 0;
+	return ret;
+};
+
+int Configure::_release(conf_item* conf_tree) {
 	if (NULL == conf_tree) {
 		return 0;
 	}
 	if (NULL != conf_tree->child) {
-		release(conf_tree->child);
+		_release(conf_tree->child);
 	}
 	if (NULL != conf_tree->brother) {
-		release(conf_tree->brother);
+		_release(conf_tree->brother);
 	}
 	delete conf_tree;
 	conf_tree = NULL;

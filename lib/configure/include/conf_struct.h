@@ -12,14 +12,15 @@
 
 #include <stdio.h>
 #include <list>
+#include <string>
 
 namespace configure {
 
 struct conf_struct {
 	std::string key;
-	int value_num;
 	std::string value;
-	std::list<std::string> value_list;
+	int value_num;
+	int value_iter;
 	struct conf_struct* child;
 	struct conf_struct* brother;
 	conf_struct() {

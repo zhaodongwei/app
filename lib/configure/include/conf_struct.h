@@ -62,6 +62,10 @@ public:
 
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
+	
+	int to_int();
+	double to_double();
+	std::string to_string();
 
 private:
 	std::string _key;

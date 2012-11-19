@@ -3,7 +3,7 @@
  * author: zhaodongwei(joodaw@gmail.com)
  * 
  * file: configure.cpp
- * date: 2012-11-16
+ * date: 2012-11-19
  * desc: main function of configure
  ***********************************************************/
 

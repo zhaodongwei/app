@@ -42,10 +42,10 @@ Configure::~Configure() {
 int Configure::_parse() {
 	_root = new conf_item;
 	_root->set_key("root");
-	char line[1024];
-	char token[1024];
-	const char* iter = line;
-	while(NULL != fgets(line, 1024, _fs)) {
+	char line[CONF_LINE_NUM];
+	char token[CONF_LINE_NUM];
+	char* iter = line;
+	while(get_next_line(line, CONF_LINE_NUM)) {
 		iter = line;
 		fprintf(stdout, "%s", line);
 		conf_item* item = new conf_item;
@@ -64,9 +64,9 @@ int Configure::_parse() {
 	}
 };
 
-int Configure::_parse_key(const char*& src, char* token) {
+int Configure::_parse_key(char*& src, char* token) {
 	if (NULL == src || NULL == token) {
-		return -1;
+		return CONF_ERROR;
 	}
 	while (*src == ' ' || *src == '\t') {
 		src++;
@@ -82,9 +82,9 @@ int Configure::_parse_key(const char*& src, char* token) {
 	return ret;
 };
 
-int Configure::_parse_split(const char*& src, char* token) {
+int Configure::_parse_split(char*& src, char* token) {
 	if (NULL == src || NULL == token) {
-		return -1;
+		return CONF_ERROR;
 	}
 	while (*src == ' ' || *src == '\t') {
 		src++;
@@ -99,9 +99,17 @@ int Configure::_parse_split(const char*& src, char* token) {
 	return ret;
 };
 
-int Configure::_parse_value(const char*& src, char* token) {
+int Configure::_parse_value(char*& src, char* token) {
 	if (NULL == src || NULL == token) {
-		return -1;
+		return CONF_ERROR;
+	}
+	int src_len = strlen(src);
+	if (src_len == 0) {
+		return CONF_ERROR;
+	}
+	
+	if (src[src_len - 2] == '\\') {
+		get_next_line(src + src_len - 2, CONF_LINE_NUM - src_len);
 	}
 	while (*src == ' ' || *src == '\t') {
 		src++;
@@ -113,6 +121,14 @@ int Configure::_parse_value(const char*& src, char* token) {
 		ret++;
 	}
 	token[ret] = 0;
+	return ret;
+};
+
+bool Configure::get_next_line(char* line, int length) {
+	bool ret = false;
+	if (NULL != fgets(line, length, _fs)) {
+		ret = true;
+	}
 	return ret;
 };
 

@@ -17,7 +17,17 @@ ConfStruct::ConfStruct() {
 	_child = NULL;
 	_brother = NULL;
 	_father = NULL;
-}
+};
+
+ConfStruct::ConfStruct(const char* key, const char* value) {
+	_key.append(key);
+	_value.append(value);
+};
+
+ConfStruct::ConfStruct(const std::string& key, const std::string& value) {
+	_key.append(key);
+	_value.append(value);
+};
 
 ConfStruct::~ConfStruct() {
 	fprintf(stdout, "[delete]key: %s\n", _key.c_str());

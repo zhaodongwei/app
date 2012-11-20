@@ -16,6 +16,9 @@
 
 namespace configure {
 
+const int CONF_LINE_NUM = 1024;
+const int CONF_ERROR = -1;
+
 class Configure {
 public:
 	Configure(const char* conf_file);
@@ -26,9 +29,9 @@ public:
 private:
 	FILE* _fs;
 	conf_item* _root;
-	int _parse_key(const char*& src, char* token);
-	int _parse_split(const char*& src, char* token);
-	int _parse_value(const char*& src, char* token);
+	int _parse_key(char*& src, char* token);
+	int _parse_split(char*& src, char* token);
+	int _parse_value(char*& src, char* token);
 	int _parse();
 	int _release(conf_item* conf_tree);
 	bool is_alpha_number(const char* letter) {
@@ -47,6 +50,7 @@ private:
 		}
 		return false;
 	};
+	bool get_next_line(char* line, int length);
 };
 
 };

@@ -19,6 +19,8 @@ namespace configure {
 class ConfStruct {
 public:
 	ConfStruct();
+	ConfStruct(const char* key, const char* value);
+	ConfStruct(const std::string& key, const std::string& value);
 	~ConfStruct();
 	//ConfStruct* operater[](int iter);
 	//ConfStruct* operater[](const char* iter);

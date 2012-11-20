@@ -123,4 +123,32 @@ int ConfStruct::to_int() {
 double ConfStruct::to_double() {
 	return (double)_parse_number();
 };
+
+std::string ConfStruct::to_string() {
+	return _value;
+};
+
+const char* ConfStruct::to_cstr() {
+	return _value.c_str();
+};
+
+ConfStruct& ConfStruct::operator[](const char* key) {
+	ConfStruct* child = _child;
+	if (NULL == child) {
+		fprintf(stderr, "[no such key] %s\n", key);
+	}
+	ConfStruct* ret = NULL;
+	while (NULL != child) {
+		if (!child->get_key().compare(key)) {
+			ret = child;
+			break;
+		}
+		child = child->get_brother();
+	}
+	if (NULL == child) {
+		fprintf(stderr, "[no such key] %s\n", key);
+	}
+	return *ret;
+};
+
 }

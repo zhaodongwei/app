@@ -66,6 +66,9 @@ public:
 	int to_int();
 	double to_double();
 	std::string to_string();
+	const char* to_cstr();
+
+	ConfStruct& operator[](const char*);
 
 private:
 	std::string _key;

@@ -60,6 +60,7 @@ int Configure::_parse() {
 		item->set_value(token);
 		fprintf(stdout, "value: -->%s<--\n", item->get_value().c_str());
 		fprintf(stdout, "I'm double: %lf\n", item->to_double());
+		fprintf(stdout, "The _value of _key %s is %s\n", "input", (*_root)["input"].to_cstr());
 	}
 };
 

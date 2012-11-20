@@ -161,4 +161,23 @@ ConfStruct& ConfStruct::operator[](const char* key) {
 	return *ret;
 };
 
+ConfStruct& ConfStruct::operator[](int key) {
+	if (key < 0) {
+		fprintf(stderr, "[conf]invalid key");
+		return *this;
+	}
+	ConfStruct* bro = this;
+	int iter = 0;
+	while (bro != NULL && iter < key ) {
+		bro = bro->get_brother();
+	}
+	if (iter == key) {
+		return *bro;
+	}
+	else {
+		fprintf(stderr, "[conf]invalid key");
+		return *this;
+	}
+};
+
 }

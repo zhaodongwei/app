@@ -32,6 +32,10 @@ public:
 		_key.clear();
 		_key.append(key_in);
 	}
+	void set_key(const std::string& key) {
+		_key.clear();
+		_key.append(key);
+	}
 
 	std::string get_value() const {
 		return _value;
@@ -71,6 +75,7 @@ public:
 	const char* to_cstr();
 
 	ConfStruct& operator[](const char*);
+	ConfStruct& operator[](int);
 
 private:
 	std::string _key;

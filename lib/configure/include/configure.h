@@ -37,6 +37,7 @@ private:
 	int _parse();
 	int _release(conf_item* conf_tree);
 	int expect(char*& src, const char*des);
+	int get_token(char*& src, char* token, int length);
 	bool is_alpha_number(const char* letter) {
 		char item = *letter;
 		if (item >= 'a' && item <= 'z') {

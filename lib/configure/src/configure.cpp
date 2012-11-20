@@ -46,7 +46,7 @@ int Configure::_parse() {
 	char* iter = line;
 	while(get_next_line(line, CONF_LINE_NUM)) {
 		iter = line;
-		fprintf(stdout, "%s", line);
+		fprintf(stdout, "%s\n", line);
 		conf_item* item = new conf_item;
 		item->set_father(_root);
 		item->add_to_tree();
@@ -64,18 +64,9 @@ int Configure::_parse_key(char*& src, conf_item* item) {
 	if (NULL == src || NULL == item) {
 		return CONF_ERROR;
 	}
-	while (*src == ' ' || *src == '\t') {
-		src++;
-	}
 	int ret = 0;
 	char token[CONF_LINE_NUM];
-	while (is_alpha_number(src) && *src != '\n' 
-			&& *src != ' ' && *src != '\t') {
-		token[ret] = *src;
-		src++;
-		ret++;
-	}
-	token[ret] = 0;
+	get_token(src, token, CONF_LINE_NUM);
 	item->set_key(token);
 	return ret;
 };
@@ -93,15 +84,15 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 		src++;
 	}
 	if (*src == '[') {
+		expect(src, "[");
 		return _parse_array(src, item);
 	}
 
 	int ret = 0;
 	char token[CONF_LINE_NUM];
 	while (*src != '\n') {
-		token[ret] = *src;
+		token[ret++] = *src;
 		src++;
-		ret++;
 	}
 	token[ret] = 0;
 	item->set_value(token);
@@ -112,7 +103,38 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 	if (NULL == src || NULL == item) {
 		return CONF_ERROR;
 	}
-	expect(src, "\\");	
+	char token[CONF_LINE_NUM];
+	fprintf(stdout, "[array]%s\n", src);
+	int element_cnt = 0;
+	while (get_token(src, token, CONF_LINE_NUM) > 0) {
+		fprintf(stdout, "[array]try to build an element %s\n", token);
+		conf_item* tmp;
+		if (0 == element_cnt) {
+			tmp = item;
+			tmp->set_value(token);
+		}
+		else {
+			tmp = new conf_item(item->get_key().c_str(), token);
+			tmp->set_father(item->get_father());
+			tmp->add_to_tree();
+		}
+		expect(src, ",");
+		element_cnt++;
+	}
+	if (*src == 0) {
+		char tmp[CONF_LINE_NUM];
+		get_next_line(tmp, CONF_LINE_NUM);
+		char* iter = tmp;
+		conf_item* next_item = new conf_item;
+		next_item->set_key(item->get_key());
+		next_item->set_father(item);
+		next_item->add_to_tree();
+		return _parse_array(iter, next_item);
+	}	
+	if (*src == ']') {
+		return CONF_SUCC;
+	}
+	return CONF_ERROR;
 };
 
 int Configure::expect(char*& src, const char*des) {
@@ -134,6 +156,25 @@ int Configure::expect(char*& src, const char*des) {
 	return CONF_SUCC;
 };
 
+int Configure::get_token(char*& src, char* token, int length) {
+	if (NULL == src || NULL == token || length <= 0) {
+		return CONF_ERROR;
+	}
+	int len = std::min((int)strlen(src), length);
+	int iter = 0;
+	while (iter < len && (*src == ' ' || *src == '\t')) {
+		src++;
+		iter++;
+	}
+	int token_len = 0; 
+	while (iter++ < len && is_alpha_number(src)) {
+		*token++ = *src++;
+		token_len++;
+	}
+	*token = 0;
+	return token_len;
+}
+
 bool Configure::get_next_line(char* line, int length) {
 	bool ret = false;
 
@@ -149,6 +190,9 @@ bool Configure::get_next_line(char* line, int length) {
 		else {
 			ret = false;
 		}
+	}
+	if (line[len - 1] == '\n' || line[len -1] == '\r') {
+		line[len - 1] = 0;
 	}
 	return ret;
 };

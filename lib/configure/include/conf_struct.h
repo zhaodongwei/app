@@ -83,6 +83,7 @@ private:
 		return false;
 	};
 	double _get_number(std::string& str, int& iter);
+	double _parse_number();
 };
 
 typedef ConfStruct conf_item;

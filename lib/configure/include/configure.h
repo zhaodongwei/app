@@ -18,6 +18,7 @@ namespace configure {
 
 const int CONF_LINE_NUM = 1024;
 const int CONF_ERROR = -1;
+const int CONF_SUCC = 0;
 
 class Configure {
 public:
@@ -29,11 +30,13 @@ public:
 private:
 	FILE* _fs;
 	conf_item* _root;
-	int _parse_key(char*& src, char* token);
-	int _parse_split(char*& src, char* token);
-	int _parse_value(char*& src, char* token);
+	int _parse_key(char*& src, conf_item* item);
+	int _parse_value(char*& src, conf_item* item);
+	int _parse_array(char*& src, conf_item* item);
+
 	int _parse();
 	int _release(conf_item* conf_tree);
+	int expect(char*& src, const char*des);
 	bool is_alpha_number(const char* letter) {
 		char item = *letter;
 		if (item >= 'a' && item <= 'z') {

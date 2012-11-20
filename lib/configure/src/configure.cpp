@@ -59,6 +59,7 @@ int Configure::_parse() {
 		_parse_value(iter, token);
 		item->set_value(token);
 		fprintf(stdout, "value: -->%s<--\n", item->get_value().c_str());
+		fprintf(stdout, "I'm double: %lf\n", item->to_double());
 	}
 };
 

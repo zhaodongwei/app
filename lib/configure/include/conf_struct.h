@@ -75,6 +75,14 @@ private:
 	ConfStruct* _child;
 	ConfStruct* _brother;
 	ConfStruct* _father;
+	
+	bool _is_number(char letter) {
+		if (letter >= '0' && letter <= '9') {
+			return true;
+		}
+		return false;
+	};
+	double _get_number(std::string& str, int& iter);
 };
 
 typedef ConfStruct conf_item;

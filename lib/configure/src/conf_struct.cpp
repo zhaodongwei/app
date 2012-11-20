@@ -7,6 +7,8 @@
  * desc: conf struct implement
  ***********************************************************/
 
+#include <math.h>
+
 #include "conf_struct.h"
 
 namespace configure {
@@ -55,4 +57,88 @@ ConfStruct* ConfStruct::get_last_child() const {
 	return ret;
 };
 
+double ConfStruct::_get_number(std::string& str, int& iter) {
+	if (iter >= str.size() || iter < 0) {
+		return 0.0;
+	}
+	int label = 1;
+	if (str[iter] == '-') {
+		label = -1;
+		iter++;
+	}
+	else if(str[iter] == '+') {
+		iter++;
+	}
+
+	double ret = 0;
+	while (iter < str.size() && _is_number(str[iter])) {
+		ret = ret * 10 + (int)(str[iter] - '0');
+		iter++;
+	}
+	if (iter < str.size() && str[iter] == '.') {
+		iter++;
+		fprintf(stdout, "[number]got a decimal part\n");
+	}
+	else {
+		return ret * label;
+	}
+
+	double decimal = 0.1;
+	while (iter < str.size() && _is_number(str[iter])) {
+		fprintf(stdout, "[number] %c:%lf\n", str[iter], decimal);
+		ret += (double)(str[iter] - '0') * decimal;
+		fprintf(stdout, "[number]ret= %lf\n", ret);
+		decimal *= 0.1;
+		iter++;
+	}
+	return ret * label;
 };
+
+int ConfStruct::to_int() {
+	if (_value.size() == 0) {
+		fprintf(stdout, "try to extract null value\n");
+		return 0;
+	}
+	int iter = 0;
+	double ret = _get_number(_value, iter);
+	if (iter < _value.size() 
+		&& (_value[iter] == 'E' || _value[iter] == 'e')) {
+		double base = ret;
+		double exp = _get_number(_value, ++iter);
+		if (iter == _value.size()) {
+			ret = base * pow(10, exp);
+		}
+		else {
+			ret = 0.0;
+		}
+	}
+	else if (iter < _value.size()) {
+		ret = 0.0;
+	}
+	return (int)ret;
+};
+
+double ConfStruct::to_double() {
+	if (_value.size() == 0) {
+		fprintf(stdout, "try to extract null value\n");
+		return 0;
+	}
+	int iter = 0;
+	double ret = _get_number(_value, iter);
+	if (iter < _value.size() 
+		&& (_value[iter] == 'E' || _value[iter] == 'e')) {
+		double base = ret;
+		double exp = _get_number(_value, ++iter);
+		if (iter == _value.size()) {
+			ret = base * pow(10, exp);
+		}
+		else {
+			ret = 0.0;
+		}
+	}
+	else if (iter < _value.size()) {
+		ret = 0.0;
+	}
+	return ret;
+};
+}

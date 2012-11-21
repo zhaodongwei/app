@@ -163,7 +163,7 @@ ConfStruct& ConfStruct::operator[](const char* key) {
 
 ConfStruct& ConfStruct::operator[](int key) {
 	if (key < 0) {
-		fprintf(stderr, "[conf]invalid key");
+		fprintf(stderr, "[conf]no such key");
 		return *this;
 	}
 	if (key == 0) {
@@ -180,11 +180,11 @@ ConfStruct& ConfStruct::operator[](int key) {
 		}
 		iter++;
 	}
-	if (iter == key) {
+	if (iter == key && NULL != next) {
 		return *next;
 	}
 	else {
-		fprintf(stderr, "[conf]invalid key");
+		fprintf(stderr, "[conf]no such key\n");
 		return *this;
 	}
 };

@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include "configure.h"
+#include "conf_nodetype.h"
 
 namespace configure {
 
@@ -42,6 +43,8 @@ Configure::~Configure() {
 int Configure::_parse() {
 	_root = new conf_item;
 	_root->set_key("root");
+	_root->set_nodetype(ROOT);
+
 	char line[CONF_LINE_NUM];
 	char* iter = line;
 	while(get_next_line(line, CONF_LINE_NUM)) {
@@ -96,6 +99,7 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 	}
 	token[ret] = 0;
 	item->set_value(token);
+	item->set_nodetype(ITEM);
 	fprintf(stdout, "[parse value] value: %s\n", item->get_value().c_str());
 	return ret;
 };
@@ -119,6 +123,7 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 			tmp->set_father(item->get_father());
 			tmp->add_to_tree();
 		}
+		tmp->set_nodetype(ARRAY_ITEM);
 		expect(src, ",");
 		element_cnt++;
 	}

@@ -14,6 +14,8 @@
 #include <list>
 #include <string>
 
+#include "conf_nodetype.h"
+
 namespace configure {
 
 class ConfStruct {
@@ -64,6 +66,13 @@ public:
 		_father = p_father;
 	};
 
+	nodetype get_nodetype() {
+		return _node;
+	}
+	void set_nodetype(nodetype node_in) {
+		_node = node_in;
+	}
+
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
 	
@@ -78,8 +87,7 @@ public:
 private:
 	std::string _key;
 	std::string _value;
-	int _value_num;
-	int _value_icnt;
+	nodetype _node;
 	ConfStruct* _child;
 	ConfStruct* _brother;
 	ConfStruct* _father;

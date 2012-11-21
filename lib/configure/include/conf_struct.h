@@ -22,8 +22,6 @@ public:
 	ConfStruct(const char* key, const char* value);
 	ConfStruct(const std::string& key, const std::string& value);
 	~ConfStruct();
-	//ConfStruct* operater[](int iter);
-	//ConfStruct* operater[](const char* iter);
 
 	std::string get_key() const {
 		return _key;
@@ -74,8 +72,8 @@ public:
 	std::string to_string();
 	const char* to_cstr();
 
-	ConfStruct& operator[](const char*);
-	ConfStruct& operator[](int);
+	ConfStruct& operator[](const char* key);
+	ConfStruct& operator[](int key);
 
 private:
 	std::string _key;

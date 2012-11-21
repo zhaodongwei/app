@@ -207,6 +207,12 @@ int Configure::_release(conf_item* conf_tree) {
 	delete conf_tree;
 	conf_tree = NULL;
 };
+conf_item& Configure::operator[](const char* item) {
+	return (*_root)[item];
+}
+conf_item& Configure::operator[](int item) {
+	return (*_root)[item];
+};
 
 };
 

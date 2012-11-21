@@ -90,12 +90,13 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 
 	int ret = 0;
 	char token[CONF_LINE_NUM];
-	while (*src != '\n') {
+	while (*src != 0) {
 		token[ret++] = *src;
 		src++;
 	}
 	token[ret] = 0;
 	item->set_value(token);
+	fprintf(stdout, "[parse value] value: %s\n", item->get_value().c_str());
 	return ret;
 };
 
@@ -132,6 +133,7 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 		return _parse_array(iter, next_item);
 	}	
 	if (*src == ']') {
+		expect(src, "]");
 		return CONF_SUCC;
 	}
 	return CONF_ERROR;
@@ -146,6 +148,7 @@ int Configure::expect(char*& src, const char*des) {
 	}
 	int i = 0;
 	int len = strlen(des);
+	fprintf(stdout, "[expect]%s,from: %s\n", des, src);
 	while (i < len && src[i] == des[i]) {
 		i++;
 		src++;

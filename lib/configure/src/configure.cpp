@@ -176,9 +176,10 @@ int Configure::_parse_branch(char*& src, conf_item*& item) {
 	node->set_father(_get_father_node(layer));
 	node->add_to_tree();
 	_set_father_node(layer, node);
+	fprintf(stdout, "[layer] key: %s, %d\n", node->get_key().c_str(), layer);
 	item = node;
 	if (*src == 0) {
-		fprintf(stdout, "[build]key: %s, value: %s, father key: %s\n", 
+		fprintf(stdout, "[build branch]key: %s, value: %s, father key: %s\n", 
 			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
@@ -198,7 +199,7 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	_set_father_node(layer, node);
 	item = node;
 	if (*src == 0) {
-		fprintf(stdout, "[build]key: %s, value: %s, father key: %s\n", 
+		fprintf(stdout, "[build trunk]key: %s, value: %s, father key: %s\n", 
 			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
@@ -213,7 +214,7 @@ int Configure::_parse_item(char*& src, conf_item* item) {
 	node->add_to_tree();
 	_parse_value(src, node);
 	if (*src == 0) {
-		fprintf(stdout, "[build]key: %s, value: %s, father key: %s\n", 
+		fprintf(stdout, "[build item]key: %s, value: %s, father key: %s\n", 
 			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
@@ -229,7 +230,7 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	node->add_to_tree();
 	_parse_array(src, node);
 	if (*src == 0) {
-		fprintf(stdout, "[build]key: %s, value: %s, father key: %s\n", 
+		fprintf(stdout, "[build array item]key: %s, value: %s, father key: %s\n", 
 			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	

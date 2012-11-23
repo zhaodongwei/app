@@ -22,6 +22,7 @@ class ConfStruct {
 public:
 	ConfStruct();
 	ConfStruct(const char* key, const char* value);
+	ConfStruct(nodetype node);
 	ConfStruct(const std::string& key, const std::string& value);
 	~ConfStruct();
 

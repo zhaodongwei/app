@@ -11,7 +11,8 @@
 #define _CONF_NODETYPE_H_
 
 enum all_types{
-	ROOT = 1,
+	INVALID = 0,
+	ROOT,
 	TRUNK,
 	BRANCH,
 	ITEM,

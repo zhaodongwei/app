@@ -17,16 +17,32 @@ ConfStruct::ConfStruct() {
 	_child = NULL;
 	_brother = NULL;
 	_father = NULL;
+	_node = INVALID;
 };
 
 ConfStruct::ConfStruct(const char* key, const char* value) {
 	_key.append(key);
 	_value.append(value);
+	_child = NULL;
+	_brother = NULL;
+	_father = NULL;
+	_node = INVALID;
 };
 
 ConfStruct::ConfStruct(const std::string& key, const std::string& value) {
 	_key.append(key);
 	_value.append(value);
+	_child = NULL;
+	_brother = NULL;
+	_father = NULL;
+	_node = INVALID;
+};
+
+ConfStruct::ConfStruct(nodetype node) {
+	_child = NULL;
+	_brother = NULL;
+	_father = NULL;
+	_node = node;
 };
 
 ConfStruct::~ConfStruct() {

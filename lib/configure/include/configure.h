@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 #include "conf_struct.h"
 
 namespace configure {
@@ -31,6 +32,16 @@ public:
 private:
 	FILE* _fs;
 	conf_item* _root;
+	std::vector<conf_item*> _layers;
+	nodetype _check_type(char* src);
+	int _parse_branch(char*& src, conf_item*& item);
+	int _parse_trunk(char*& src, conf_item*& item);
+	int _parse_item(char*& src, conf_item* item);
+	int _parse_array_item(char*& src, conf_item* item);
+	int _get_layer(char*& src);
+	conf_item* _get_father_node(int layer);
+	int _set_father_node(int layer, conf_item* node);
+
 	int _parse_key(char*& src, conf_item* item);
 	int _parse_value(char*& src, conf_item* item);
 	int _parse_array(char*& src, conf_item* item);

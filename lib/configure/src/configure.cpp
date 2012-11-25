@@ -184,11 +184,10 @@ int Configure::_parse_branch(char*& src, conf_item*& item) {
 	node->set_father(_get_father_node(layer));
 	node->add_to_tree();
 	_set_father_node(layer, node);
-	fprintf(stdout, "[layer] key: %s, %d\n", node->get_key().c_str(), layer);
+	_show_layers();
+	fprintf(stdout, "[layer]key= %s,layer= %d\n", node->get_key().c_str(), layer);
 	item = node;
 	if (*src == 0) {
-		fprintf(stdout, "[build branch]key: %s, value: %s, father key: %s\n", 
-			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
 	return CONF_ERROR;
@@ -208,7 +207,6 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	_show_layers();
 	fprintf(stdout, "[layer]key= %s,layer= %d\n", node->get_key().c_str(), layer);
 	item = node;
-	//fprintf(stdout, "[layer] key: %s, father key: %s, %d\n", node->get_key().c_str(), node->get_father()->get_key().c_str(), layer);
 	if (*src == 0) {
 		return CONF_SUCC;
 	}	

@@ -145,6 +145,7 @@ int Configure::_get_layer(char*& src) {
 		src++;
 		ret++;
 	}
+	return ret;
 };
 
 conf_item* Configure::_get_father_node(int layer) {
@@ -158,11 +159,18 @@ int Configure::_set_father_node(int layer, conf_item* node) {
 	if (NULL == node) {
 		return CONF_ERROR;
 	}
+	fprintf(stdout, "[insert] tery to insert %s into %d layer\n", node->get_key().c_str(), layer);
 	if (_layers.size() - 1 < layer) {
 		return CONF_ERROR;
 	}
-	_layers[layer + 1] = node;
-}
+	if (_layers.size() - 1 == layer) {
+		_layers.push_back(node);
+	} 
+	else {
+		_layers[layer + 1] = node;
+	}
+	return CONF_SUCC;
+};
 
 int Configure::_parse_branch(char*& src, conf_item*& item) {
 	expect(src, "[");
@@ -197,10 +205,11 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	node->set_father(_get_father_node(layer));
 	node->add_to_tree();
 	_set_father_node(layer, node);
+	_show_layers();
+	fprintf(stdout, "[layer]key= %s,layer= %d\n", node->get_key().c_str(), layer);
 	item = node;
+	//fprintf(stdout, "[layer] key: %s, father key: %s, %d\n", node->get_key().c_str(), node->get_father()->get_key().c_str(), layer);
 	if (*src == 0) {
-		fprintf(stdout, "[build trunk]key: %s, value: %s, father key: %s\n", 
-			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
 	return CONF_ERROR;

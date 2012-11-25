@@ -41,6 +41,12 @@ private:
 	int _get_layer(char*& src);
 	conf_item* _get_father_node(int layer);
 	int _set_father_node(int layer, conf_item* node);
+	int _show_layers() {
+		int i = 0;
+		for (; i < _layers.size(); i++) {
+			fprintf(stdout, "[layers]layer: %d,key: %s\n", i, _layers[i]->get_key().c_str());
+		}
+	};
 
 	int _parse_key(char*& src, conf_item* item);
 	int _parse_value(char*& src, conf_item* item);

@@ -183,6 +183,23 @@ ConfStruct& ConfStruct::operator[](int key) {
 		fprintf(stderr, "[conf]no such key");
 		return *this;
 	}
+	if (BRANCH == _node) {
+		ConfStruct* next = this;
+		int iter = 0;
+		while (next != NULL && iter < key) {
+			if (!_key.compare(next->get_key())) {
+				iter++;
+			}
+			next = next->get_brother();
+		}
+		if (next != NULL && key == iter) {
+			return *next;
+		}
+		else {
+			fprintf(stderr, "[conf]no such key %d\n", key);
+			return *this;
+		}
+	}
 	ConfStruct* next = this;
 	int iter = 0;
 	while (next != NULL && iter < key ) {

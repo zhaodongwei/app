@@ -45,6 +45,10 @@ public:
 		_value.clear();
 		_value.append(value_in);
 	}
+	void set_value(const std::string& value) {
+		_value.clear();
+		_value.append(value);
+	}
 	
 	ConfStruct* get_child() const {
 		return _child;
@@ -69,10 +73,21 @@ public:
 
 	nodetype get_nodetype() {
 		return _node;
-	}
+	};
 	void set_nodetype(nodetype node_in) {
 		_node = node_in;
-	}
+	};
+
+	int set_shadow(ConfStruct* src) {
+		if (NULL == src) {
+			return -1;
+		}
+		_shadow = src;
+		return 0;
+	};
+	ConfStruct* get_shadow() {
+		return _shadow;
+	};
 
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
@@ -92,6 +107,8 @@ private:
 	ConfStruct* _child;
 	ConfStruct* _brother;
 	ConfStruct* _father;
+	ConfStruct* _shadow;
+	int init();
 	
 	bool _is_number(char letter) {
 		if (letter >= '0' && letter <= '9') {

@@ -17,6 +17,7 @@ enum all_types{
 	BRANCH,
 	ITEM,
 	ARRAY_ITEM,
+	SHADOW
 };
 
 typedef enum all_types nodetype; 

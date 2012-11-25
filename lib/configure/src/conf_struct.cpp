@@ -14,46 +14,47 @@
 namespace configure {
 
 ConfStruct::ConfStruct() {
-	_child = NULL;
-	_brother = NULL;
-	_father = NULL;
-	_node = INVALID;
+	init();
 };
 
 ConfStruct::ConfStruct(const char* key, const char* value) {
+	init();
 	_key.append(key);
 	_value.append(value);
-	_child = NULL;
-	_brother = NULL;
-	_father = NULL;
-	_node = INVALID;
 };
 
 ConfStruct::ConfStruct(const std::string& key, const std::string& value) {
+	init();
 	_key.append(key);
 	_value.append(value);
+};
+
+ConfStruct::ConfStruct(nodetype node) {
+	init();
+	_node = node;
+};
+
+int ConfStruct::init() {
 	_child = NULL;
 	_brother = NULL;
 	_father = NULL;
 	_node = INVALID;
-};
-
-ConfStruct::ConfStruct(nodetype node) {
-	_child = NULL;
-	_brother = NULL;
-	_father = NULL;
-	_node = node;
+	_shadow = NULL;
 };
 
 ConfStruct::~ConfStruct() {
 	fprintf(stdout, "[delete]key: %s\n", _key.c_str());
-	if (NULL != _child) {
+	if (NULL != _child && SHADOW != _node) {
 		delete _child;
 		_child = NULL;
 	}
-	if (NULL != _brother) {
+	if (NULL != _brother && SHADOW != _node) {
 		delete _brother;
 		_brother = NULL;
+	}
+	if (NULL != _shadow) {
+		delete _shadow;
+		_shadow = NULL;
 	}
 };
 
@@ -182,13 +183,10 @@ ConfStruct& ConfStruct::operator[](int key) {
 		fprintf(stderr, "[conf]no such key");
 		return *this;
 	}
-	if (key == 0) {
-		return *this;
-	}
 	ConfStruct* next = this;
 	int iter = 0;
 	while (next != NULL && iter < key ) {
-		if (_child != NULL) {
+		if (SHADOW != _node) {
 			next = next->get_child();
 		}
 		else {
@@ -197,10 +195,25 @@ ConfStruct& ConfStruct::operator[](int key) {
 		iter++;
 	}
 	if (iter == key && NULL != next) {
-		return *next;
+		if (SHADOW != _node) {
+			ConfStruct* tmp = next->get_shadow();
+			if (NULL != tmp) {
+				return *tmp;
+			}
+			tmp = new ConfStruct(SHADOW);
+			next->set_shadow(tmp);
+			tmp->set_key(next->get_key());
+			tmp->set_value(next->get_value());
+			tmp->set_brother(next->get_brother());
+			fprintf(stdout, "[shadow]build a shadow key=%s, value=%s\n", tmp->get_key().c_str(), tmp->get_value().c_str());
+			return *tmp;
+		}
+		else {
+			return *next;
+		}
 	}
 	else {
-		fprintf(stderr, "[conf]no such key\n");
+		fprintf(stderr, "[conf]no such key %d\n", key);
 		return *this;
 	}
 };

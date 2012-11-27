@@ -16,7 +16,7 @@ int main() {
 	fprintf(stdout, "[test]input: %s\n", conf["trunck"]["branch"]["another_branch"]["input"].to_cstr());
 	fprintf(stdout, "[test]output: %s\n", conf["trunck"]["branch"][0]["another_branch"]["output"].to_cstr());
 	fprintf(stdout, "[test]output: %s\n", conf["trunck"]["branch"][1]["another_branch"]["output"].to_cstr());
-	fprintf(stdout, "[test]array: %s\n", conf["trunck"]["branch"]["another_branch"]["array"][1][3].to_cstr());
+	fprintf(stdout, "[test]array: %s\n", conf["trunck"]["branch"][1]["another_branch"]["array"][1][3].to_cstr());
 	return 0;
 }
 

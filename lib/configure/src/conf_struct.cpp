@@ -43,7 +43,6 @@ int ConfStruct::init() {
 };
 
 ConfStruct::~ConfStruct() {
-	fprintf(stdout, "[delete]key: %s\n", _key.c_str());
 	if (NULL != _child && SHADOW != _node) {
 		delete _child;
 		_child = NULL;
@@ -222,7 +221,6 @@ ConfStruct& ConfStruct::operator[](int key) {
 			tmp->set_key(next->get_key());
 			tmp->set_value(next->get_value());
 			tmp->set_brother(next->get_brother());
-			fprintf(stdout, "[shadow]build a shadow key=%s, value=%s\n", tmp->get_key().c_str(), tmp->get_value().c_str());
 			return *tmp;
 		}
 		else {

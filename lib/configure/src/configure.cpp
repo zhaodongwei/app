@@ -105,37 +105,21 @@ int Configure::_parse() {
 				fprintf(stderr, "[parse] INVALID CONF LINE: %s\n", line);
 				break;
 			case TRUNK:
-				fprintf(stderr, "[parse] TRUNK: %s\n", line);
 				_parse_trunk(iter, pre_trunk_or_branch);
 				break;
 			case BRANCH:
-				fprintf(stderr, "[parse] BRANCH: %s\n", line);
 				_parse_branch(iter, pre_trunk_or_branch);
 				break;
 			case ITEM:
-				fprintf(stderr, "[parse] ITEM: %s\n", line);
 				_parse_item(iter, pre_trunk_or_branch);
 				break;
 			case ARRAY_ITEM:
-				fprintf(stderr, "[parse] ARRAY_ITEM: %s\n", line);
 				_parse_array_item(iter, pre_trunk_or_branch);
 				break;
 			default:
-				fprintf(stderr, "[parse] fatal error occurs: %s\n", line);
+				fprintf(stdout, "[parse] fatal error occurs: %s\n", line);
 				break;
 		}
-/*
-		conf_item* item = new conf_item;
-		item->set_father(_root);
-		item->add_to_tree();
-		_parse_key(iter, item);
-		fprintf(stdout, "key: -->%s<--\n", item->get_key().c_str());
-		expect(iter, ":");
-		_parse_value(iter, item);
-		fprintf(stdout, "value: -->%s<--\n", item->get_value().c_str());
-		fprintf(stdout, "I'm double: %lf\n", item->to_double());
-		fprintf(stdout, "The _value of _key %s is %s\n", "input", (*_root)["input"].to_cstr());
-*/
 	}
 };
 
@@ -159,7 +143,6 @@ int Configure::_set_father_node(int layer, conf_item* node) {
 	if (NULL == node) {
 		return CONF_ERROR;
 	}
-	fprintf(stdout, "[insert] tery to insert %s into %d layer\n", node->get_key().c_str(), layer);
 	if (_layers.size() - 1 < layer) {
 		return CONF_ERROR;
 	}
@@ -184,8 +167,6 @@ int Configure::_parse_branch(char*& src, conf_item*& item) {
 	node->set_father(_get_father_node(layer));
 	node->add_to_tree();
 	_set_father_node(layer, node);
-	_show_layers();
-	fprintf(stdout, "[layer]key= %s,layer= %d\n", node->get_key().c_str(), layer);
 	item = node;
 	if (*src == 0) {
 		return CONF_SUCC;
@@ -204,8 +185,6 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	node->set_father(_get_father_node(layer));
 	node->add_to_tree();
 	_set_father_node(layer, node);
-	_show_layers();
-	fprintf(stdout, "[layer]key= %s,layer= %d\n", node->get_key().c_str(), layer);
 	item = node;
 	if (*src == 0) {
 		return CONF_SUCC;
@@ -221,8 +200,6 @@ int Configure::_parse_item(char*& src, conf_item* item) {
 	node->add_to_tree();
 	_parse_value(src, node);
 	if (*src == 0) {
-		fprintf(stdout, "[build item]key: %s, value: %s, father key: %s\n", 
-			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
 	return CONF_ERROR;
@@ -237,8 +214,6 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	node->add_to_tree();
 	_parse_array(src, node);
 	if (*src == 0) {
-		fprintf(stdout, "[build array item]key: %s, value: %s, father key: %s\n", 
-			node->get_key().c_str(), node->get_value().c_str(), node->get_father()->get_key().c_str());
 		return CONF_SUCC;
 	}	
 	return CONF_ERROR;
@@ -270,14 +245,13 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 
 	int ret = 0;
 	char token[CONF_LINE_NUM];
-	while (*src != 0) {
+	while (*src != 0 && *src != ' ' && *src != '\t' && *src != '\n') {
 		token[ret++] = *src;
 		src++;
 	}
 	token[ret] = 0;
 	item->set_value(token);
 	item->set_nodetype(ITEM);
-	fprintf(stdout, "[parse value] value: %s\n", item->get_value().c_str());
 	return ret;
 };
 
@@ -286,10 +260,8 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 		return CONF_ERROR;
 	}
 	char token[CONF_LINE_NUM];
-	fprintf(stdout, "[array]%s\n", src);
 	int element_cnt = 0;
 	while (get_token(src, token, CONF_LINE_NUM) > 0) {
-		fprintf(stdout, "[array]try to build an element %s\n", token);
 		conf_item* tmp;
 		if (0 == element_cnt) {
 			tmp = item;

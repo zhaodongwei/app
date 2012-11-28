@@ -1,5 +1,5 @@
 /***********************************************************
- * Copyright: zhaodongwei@nanjing university
+ * copyright: zhaodongwei@nanjing university
  * author: zhaodongwei(joodaw@gmail.com)
  * 
  * file: test.h
@@ -16,7 +16,4 @@ int main() {
 	fprintf(stdout, "after throwing an exception\n");
 	return 0;
 }
-
-
-
 

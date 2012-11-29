@@ -19,7 +19,7 @@ Configure::Configure(const char* conf_file) {
 	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
-		throw exception(NOT_EXIST, "%s", conf_file);
+		throw exception(NOT_EXIST, "%s", conf_file.c_str());
 	}
 	_root = NULL;
 	_parse();

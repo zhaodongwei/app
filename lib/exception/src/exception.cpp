@@ -8,15 +8,32 @@
  ***********************************************************/
 
 #include <stdio.h>
+#include <string>
+#include <stdarg.h>
+
 #include "exception.h"
 
-exception::exception(const char* info) {
-	fprintf(stdout, "%s\n", info);
+exception::exception() {
+	fprintf(stdout, "[FATAL] fatal occurs");
 };
 
-exception::exception(fatal_type type, const char* info) {
+exception::exception(const char* info, ...) {
+	char buffer[1024];
+	va_list args;
+	va_start(args, info);
+	vsprintf(buffer, info, args);
+	va_end(args);
+	fprintf(stdout, "%s\n", buffer);
+};
+
+exception::exception(fatal_type type, const char* info, ...) {
 	_print_type(type);
-	fprintf(stdout, "%s\n", info);
+	char buffer[1024];
+	va_list args;
+	va_start(args, info);
+	vsprintf(buffer, info, args);
+	va_end(args);
+	fprintf(stdout, "%s\n", buffer);
 };
 
 void exception::_print_type(fatal_type type) {

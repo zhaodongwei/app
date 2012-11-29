@@ -10,6 +10,9 @@
 #ifndef _EXCEPTION_H_
 #define _EXCEPTION_H_
 
+#define EXCEPTION_SUCC 0
+#define EXCEPTION_ERROR -1
+
 enum FATAL_TYPE {
 	NOT_EXIST,
 	LOGIC,
@@ -25,8 +28,9 @@ typedef enum FATAL_TYPE fatal_type;
 class exception {
 
 public:
-	exception(const char* info);
-	exception(fatal_type type, const char* info);
+	exception();
+	exception(const char* info, ...);
+	exception(fatal_type type, const char* info, ...);
 	~exception(){};
 
 private:

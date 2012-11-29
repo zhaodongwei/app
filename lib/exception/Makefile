@@ -3,7 +3,7 @@ all : exception lib
 exception : test.o lib
 	g++ -I ./include -o exception test.o libexception.a
 
-test.o : test/test.cpp
+test.o : test/test.cpp include/*
 	g++ -c -I ./include test/test.cpp
 
 exception.o : include/* src/*

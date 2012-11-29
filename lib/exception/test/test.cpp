@@ -12,7 +12,7 @@
 
 int main() {
 	fprintf(stdout, "before throwing an exception\n");
-	throw exception(NOT_EXIST, "This is an exception");
+	throw exception(NOT_EXIST, "%s, %d, %lf", "string", 101, 3.14);
 	fprintf(stdout, "after throwing an exception\n");
 	return 0;
 }

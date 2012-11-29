@@ -11,6 +11,7 @@
 
 #include "configure.h"
 #include "conf_nodetype.h"
+#include "exception.h"
 
 namespace configure {
 
@@ -18,6 +19,7 @@ Configure::Configure(const char* conf_file) {
 	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
+		throw exception(NOT_EXIST, "%s", conf_file);
 	}
 	_root = NULL;
 	_parse();
@@ -27,6 +29,7 @@ Configure::Configure(const std::string& conf_file) {
 	_fs = fopen(conf_file.c_str(), "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
+		throw exception(NOT_EXIST, "%s", conf_file.c_str());
 	}
 	_root = NULL;
 	_parse();
@@ -100,25 +103,30 @@ int Configure::_parse() {
 	while(get_next_line(line, CONF_LINE_NUM)) {
 		iter = line;
 		nodetype line_type = _check_type(iter);
+		int ret = CONF_SUCC;
 		switch(line_type) {
 			case INVALID:
 				fprintf(stderr, "[parse] INVALID CONF LINE: %s\n", line);
+				throw exception(LOGIC, "invalid conf line: %s", line);
 				break;
 			case TRUNK:
-				_parse_trunk(iter, pre_trunk_or_branch);
+				ret = _parse_trunk(iter, pre_trunk_or_branch);
 				break;
 			case BRANCH:
-				_parse_branch(iter, pre_trunk_or_branch);
+				ret = _parse_branch(iter, pre_trunk_or_branch);
 				break;
 			case ITEM:
-				_parse_item(iter, pre_trunk_or_branch);
+				ret = _parse_item(iter, pre_trunk_or_branch);
 				break;
 			case ARRAY_ITEM:
-				_parse_array_item(iter, pre_trunk_or_branch);
+				ret = _parse_array_item(iter, pre_trunk_or_branch);
 				break;
 			default:
 				fprintf(stdout, "[parse] fatal error occurs: %s\n", line);
 				break;
+		}
+		if (CONF_ERROR == ret) {
+			//throw exception(UNEXPECTED, "unexpected conf contents: %s", line);
 		}
 	}
 };
@@ -164,7 +172,9 @@ int Configure::_parse_branch(char*& src, conf_item*& item) {
 	conf_item* node = new conf_item(BRANCH);
 	node->set_key(token);
 	expect(src, "]");
-	node->set_father(_get_father_node(layer));
+	if (NULL == node->set_father(_get_father_node(layer))) {
+		throw exception(UNEXPECTED, "unexpected layer of line: %s", src);
+	}
 	node->add_to_tree();
 	_set_father_node(layer, node);
 	item = node;
@@ -182,7 +192,9 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	conf_item* node = new conf_item(TRUNK);
 	node->set_key(token);
 	expect(src, "]");
-	node->set_father(_get_father_node(layer));
+	if (NULL == node->set_father(_get_father_node(layer))) {
+		throw exception(UNEXPECTED, "unexpected layer of line: %s", src);
+	}
 	node->add_to_tree();
 	_set_father_node(layer, node);
 	item = node;
@@ -212,7 +224,9 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	expect(src, "[");
 	node->set_father(item);
 	node->add_to_tree();
-	_parse_array(src, node);
+	if (CONF_ERROR == _parse_array(src, node)) {
+		throw exception(EXPECTED, "parse array error");
+	}
 	if (*src == 0) {
 		return CONF_SUCC;
 	}	
@@ -278,7 +292,9 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 	}
 	if (*src == 0) {
 		char tmp[CONF_LINE_NUM];
-		get_next_line(tmp, CONF_LINE_NUM);
+		if (CONF_SUCC != get_next_line(tmp, CONF_LINE_NUM)) {
+			throw exception(UNEXPECTED, "unexpected end of conf file while processing array");
+		}
 		char* iter = tmp;
 		conf_item* next_item = new conf_item;
 		next_item->set_key(item->get_key());

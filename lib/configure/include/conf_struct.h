@@ -53,29 +53,33 @@ public:
 	ConfStruct* get_child() const {
 		return _child;
 	};
-	void set_child(ConfStruct* p_child) {
+	ConfStruct* set_child(ConfStruct* p_child) {
 		_child = p_child;
+		return p_child;
 	};
 
 	ConfStruct* get_brother() const {
 		return _brother;
 	};
-	void set_brother(ConfStruct* p_brother) {
+	ConfStruct* set_brother(ConfStruct* p_brother) {
 		_brother = p_brother;
+		return p_brother;
 	};
 
 	ConfStruct* get_father() const {
 		return _father;
 	};
-	void set_father(ConfStruct* p_father) {
+	ConfStruct* set_father(ConfStruct* p_father) {
 		_father = p_father;
+		return p_father;
 	};
 
 	nodetype get_nodetype() {
 		return _node;
 	};
-	void set_nodetype(nodetype node_in) {
+	nodetype set_nodetype(nodetype node_in) {
 		_node = node_in;
+		return node_in;
 	};
 
 	int set_shadow(ConfStruct* src) {

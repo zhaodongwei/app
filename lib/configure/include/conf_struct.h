@@ -101,6 +101,11 @@ public:
 	std::string to_string();
 	const char* to_cstr();
 
+	int size();
+	bool has_key(const char* key);
+	bool has_key(const std::string& key);
+	bool has_key(int key);
+
 	ConfStruct& operator[](const char* key);
 	ConfStruct& operator[](int key);
 

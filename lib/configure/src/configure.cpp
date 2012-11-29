@@ -19,7 +19,7 @@ Configure::Configure(const char* conf_file) {
 	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
-		throw exception(NOT_EXIST, "%s", conf_file.c_str());
+		throw exception(NOT_EXIST, "%s", conf_file);
 	}
 	_root = NULL;
 	_parse();
@@ -259,11 +259,21 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 
 	int ret = 0;
 	char token[CONF_LINE_NUM];
-	while (*src != 0 && *src != ' ' && *src != '\t' && *src != '\n') {
-		token[ret++] = *src;
-		src++;
+	char* tmp = src + strlen(src) - 1;
+	while (*tmp == ' ' || *tmp == '\t') {
+		tmp--;
 	}
-	token[ret] = 0;
+	if (*src == '\"' && *tmp == '\"') {
+		*(tmp + 1) = 0;
+		sprintf(token, "%s", src);
+	}
+	else {
+		while (*src != 0 && *src != ' ' && *src != '\t' && *src != '\n') {
+			token[ret++] = *src;
+			src++;
+		}
+		token[ret] = 0;
+	}
 	item->set_value(token);
 	item->set_nodetype(ITEM);
 	return ret;
@@ -292,7 +302,7 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 	}
 	if (*src == 0) {
 		char tmp[CONF_LINE_NUM];
-		if (CONF_SUCC != get_next_line(tmp, CONF_LINE_NUM)) {
+		if (true != get_next_line(tmp, CONF_LINE_NUM)) {
 			throw exception(UNEXPECTED, "unexpected end of conf file while processing array");
 		}
 		char* iter = tmp;

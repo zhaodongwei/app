@@ -162,8 +162,7 @@ const char* ConfStruct::to_cstr() {
 ConfStruct& ConfStruct::operator[](const char* key) {
 	ConfStruct* child = _child;
 	if (NULL == child) {
-		fprintf(stderr, "[no such key] %s\n", key);
-		throw exception(LOGIC, "no such key: %s", key);
+		throw exception(UNEXPECTED, "no such key: %s", key);
 	}
 	ConfStruct* ret = NULL;
 	while (NULL != child) {
@@ -174,16 +173,14 @@ ConfStruct& ConfStruct::operator[](const char* key) {
 		child = child->get_brother();
 	}
 	if (NULL == child) {
-		fprintf(stderr, "[no such key] %s\n", key);
-		throw exception(LOGIC, "no such key: %s", key);
+		throw exception(UNEXPECTED, "no such key: %s", key);
 	}
 	return *ret;
 };
 
 ConfStruct& ConfStruct::operator[](int key) {
 	if (key < 0) {
-		fprintf(stderr, "[conf]no such key");
-		throw exception(LOGIC, "no such key: %d", key);
+		throw exception(UNEXPECTED, "no such key: %d", key);
 		return *this;
 	}
 	if (BRANCH == _node) {
@@ -199,8 +196,7 @@ ConfStruct& ConfStruct::operator[](int key) {
 			return *next;
 		}
 		else {
-			fprintf(stderr, "[conf]no such key: %d\n", key);
-			throw exception(LOGIC, "no such key: %d", key);
+			throw exception(UNEXPECTED, "no such key: %d", key);
 			return *this;
 		}
 	}
@@ -233,10 +229,68 @@ ConfStruct& ConfStruct::operator[](int key) {
 		}
 	}
 	else {
-		fprintf(stderr, "[conf]no such key: %d\n", key);
-		throw exception(LOGIC, "no such key: %d", key);
+		throw exception(UNEXPECTED, "no such key: %d", key);
 		return *this;
 	}
+};
+
+int ConfStruct::size() {
+	int ret = 1;
+	if (BRANCH == _node) {
+		ConfStruct* bro = _brother;
+		while (bro != NULL) {
+			if (BRANCH == bro->get_nodetype() && (!_key.compare(bro->get_key()))) {
+				ret++;
+			}
+			bro = bro->get_brother();
+		}
+	}
+	if (ARRAY_ITEM == _node || SHADOW == _node) {
+		if (_child != NULL) {
+			ConfStruct* tmp = _child;
+			while (NULL != tmp) {
+				ret++;
+				tmp = tmp->get_child();
+			}
+		}
+		else if (_brother != NULL) {
+			ConfStruct* tmp = _brother;
+			while (NULL != tmp) {
+				ret++;
+				tmp = tmp->get_brother();
+			}
+		}
+	}
+	return ret;
+};
+
+bool ConfStruct::has_key(const char* key) {
+	ConfStruct* child = _child;
+	while (NULL != child) {
+		if (!child->get_key().compare(key)) {
+			break;
+		}
+		child = child->get_brother();
+	}
+	if (NULL == child) {
+		return false;
+	}
+	return true;
+};
+
+bool ConfStruct::has_key(const std::string& key) {
+	return has_key(key.c_str());
+};
+
+bool ConfStruct::has_key(int key) {
+	if (key < 0) {
+		return false;
+	}
+	int ret = size();
+	if (key < ret) {
+		return true;
+	}
+	return false;
 };
 
 }

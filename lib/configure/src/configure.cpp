@@ -223,7 +223,6 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	expect(src, ":");
 	expect(src, "[");
 	node->set_father(item);
-	node->add_to_tree();
 	if (CONF_ERROR == _parse_array(src, node)) {
 		throw exception(EXPECTED, "parse array error");
 	}
@@ -265,7 +264,7 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 	}
 	if (*src == '\"' && *tmp == '\"') {
 		*(tmp + 1) = 0;
-		sprintf(token, "%s", src);
+		_regulate_value(token, src);
 	}
 	else {
 		while (*src != 0 && *src != ' ' && *src != '\t' && *src != '\n') {
@@ -277,6 +276,45 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 	item->set_value(token);
 	item->set_nodetype(ITEM);
 	return ret;
+};
+
+int Configure::_regulate_value(char* token, char* src) {
+	if (NULL == token || NULL == src) {
+		return CONF_ERROR;
+	}
+	expect(src, "\"");
+	while (*src != 0 && *src != '\"') {
+		if (*src == '\\') {
+			expect(src, "\\");
+			switch(*src) {
+				case 't':
+					*token = '\t';
+					break;
+				case 'n':
+					*token = '\n';
+					break;
+				case 'r':
+					*token = '\r';
+					break;
+				case '\\':
+					*token = '\\';
+					break;
+				case '\"':
+					*token = '\"';
+					break;
+				default:
+					throw exception(UNEXPECTED, "unexpected char while processing %s:", src);
+			};
+			token++;
+			src++;
+		}
+		else {
+			*token = *src;
+			token++;
+			src++;	
+		}
+	}
+	*token = 0;
 };
 
 int Configure::_parse_array(char*& src, conf_item* item) {
@@ -294,22 +332,29 @@ int Configure::_parse_array(char*& src, conf_item* item) {
 		else {
 			tmp = new conf_item(item->get_key().c_str(), token);
 			tmp->set_father(item->get_father());
-			tmp->add_to_tree();
 		}
+		tmp->add_to_tree();
 		tmp->set_nodetype(ARRAY_ITEM);
 		expect(src, ",");
 		element_cnt++;
 	}
+	if (element_cnt == 0 && CONF_SUCC == expect(src, "]")) {
+		delete item;
+		return CONF_SUCC;
+	}
+	if (element_cnt == 0 && CONF_SUCC != expect(src, "]")) {
+		delete item;
+		throw exception(UNEXPECTED, "invalid empty line of array");
+	}
 	if (*src == 0) {
 		char tmp[CONF_LINE_NUM];
 		if (true != get_next_line(tmp, CONF_LINE_NUM)) {
-			throw exception(UNEXPECTED, "unexpected end of conf file while processing array");
+			throw exception(UNEXPECTED, "unexpected end of array");
 		}
 		char* iter = tmp;
 		conf_item* next_item = new conf_item;
 		next_item->set_key(item->get_key());
 		next_item->set_father(item);
-		next_item->add_to_tree();
 		return _parse_array(iter, next_item);
 	}	
 	if (*src == ']') {

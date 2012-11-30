@@ -428,16 +428,22 @@ bool Configure::get_next_line(char* line, int length) {
 
 int Configure::_release(conf_item* conf_tree) {
 	if (NULL == conf_tree) {
-		return 0;
+		return CONF_SUCC;
 	}
 	delete conf_tree;
 	conf_tree = NULL;
+	return CONF_SUCC;
 };
+
 conf_item& Configure::operator[](const char* item) {
 	return (*_root)[item];
 }
 conf_item& Configure::operator[](int item) {
 	return (*_root)[item];
+};
+
+conf_item& Configure::operator[](const std::string item) {
+	return operator[](item.c_str());
 };
 
 };

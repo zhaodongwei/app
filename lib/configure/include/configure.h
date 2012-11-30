@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <string>
+
 #include "conf_struct.h"
 
 namespace configure {
@@ -26,6 +28,7 @@ public:
 	Configure(const char* conf_file);
 	Configure(const std::string& conf_file);
 	conf_item& operator[](const char* item);
+	conf_item& operator[](const std::string item);
 	conf_item& operator[](int item);
 	~Configure();
 

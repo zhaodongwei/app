@@ -6,3 +6,12 @@
  * date: 2012-11-30
  * desc: src file of zlog
  ***********************************************************/
+
+#include <stdio.h>
+
+#include "zlog.h"
+
+int zlog(zlogtype type, const char* format, ...) {
+	return ZLOG_SUCC;
+};
+

@@ -24,6 +24,27 @@ enum LOG_TYPE {
 typedef enum LOG_TYPE zlogtype;
 
 int zlog(zlogtype type, const char* format, ...);
+int zlog_load(const char* path);
+int zlog_close();
+
+class ZLog {
+
+public:
+	static ZLog* get_instance();
+	static ZLog* get_instance(const char* path);
+	int write_log(zlogtype type, const char* info);
+	int write_log(const char* info);
+	~ZLog();
+
+private:
+	ZLog(const char* path);
+	ZLog();
+	int _write_type(zlogtype type);
+	FILE* _fs;
+	int _log_level;
+	const char* _output;
+	static ZLog* _pzlog;
+};
 
 #endif //_ZLOG_H_
 

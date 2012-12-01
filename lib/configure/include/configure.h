@@ -30,6 +30,10 @@ public:
 	conf_item& operator[](const char* item);
 	conf_item& operator[](const std::string item);
 	conf_item& operator[](int item);
+	int size();
+	bool has_key(const char* key);
+	bool has_key(const std::string& key);
+	bool has_key(int key);
 	~Configure();
 
 private:

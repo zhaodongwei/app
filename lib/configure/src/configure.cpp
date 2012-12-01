@@ -446,5 +446,21 @@ conf_item& Configure::operator[](const std::string item) {
 	return operator[](item.c_str());
 };
 
+int Configure::size() {
+	return _root->size();
+};
+
+bool Configure::has_key(const char* key) {
+	return _root->has_key(key);
+};
+
+bool Configure::has_key(const std::string& key) {
+	return _root->has_key(key);
+};
+
+bool Configure::has_key(int key) {
+	return _root->has_key(key);
+};
+
 };
 

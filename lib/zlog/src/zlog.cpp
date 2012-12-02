@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <time.h>
 
 #include "exception.h"
 #include "configure.h"
@@ -57,15 +58,21 @@ ZLog::ZLog(const char* path) {
 		_log_level = 0;
 	}
 	
-	if (conf.has_key("output") && strcmp(conf["output"].to_cstr(), "stdout")) {
-		_fs = fopen(conf["output"].to_cstr(), "w+");
+	if (conf.has_key("output") && !strcmp(conf["output"].to_cstr(), "stdout")) {
+		_fs = stdout;
+	}
+	else if (conf.has_key("output") && !strcmp(conf["output"].to_cstr(), "stderr")){
+		_fs = stderr;
+	}
+	else if (conf.has_key("output")) {
+		_fs = fopen(conf["output"].to_cstr(), "a+");
 		if (NULL == _fs) {
 			throw exception("NOT_EXIST", "open %s fail", _output);
 		}
 	}
 	else {
 		_fs = stdout;
-	};
+	}
 };
 
 ZLog* ZLog::get_instance(const char* path) {
@@ -99,16 +106,27 @@ int ZLog::_write_type(zlogtype type) {
 			fprintf(_fs, "[NOTICE]");
 			break;
 		case ZWARNNING:
-			fprintf(_fs, "[WARNIING]");
+			fprintf(_fs, "[WARNNING]");
 			break;
 		case ZFATAL:
 			fprintf(_fs, "[FATAL]");
 			break;
 	};
+	time_t now;
+	tm* tmp;
+	time(&now);
+	tmp = localtime(&now);	
+	char today[1024];
+	sprintf(today, "%d-%02d-%02d",  tmp->tm_year+1900, tmp->tm_mon + 1, tmp->tm_mday);
+	sprintf(today + strlen(today), " %02d:%02d:%02d", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
+	fprintf(_fs, " * %s * ", today);
 	return ZLOG_SUCC;
 };
 
 int ZLog::write_log(zlogtype type, const char* info) {
+	if (!_show(type)) {
+		return ZLOG_SUCC;
+	}
 	_write_type(type);
 	fprintf(_fs, "%s\n", info);
 	return ZLOG_SUCC;
@@ -116,4 +134,13 @@ int ZLog::write_log(zlogtype type, const char* info) {
 
 int ZLog::write_log(const char* info) {
 	return write_log(ZNOTICE, info); 
+};
+
+bool ZLog::_show(zlogtype type) {
+	bool ret = false;
+	int i = 4 - (int)type;
+	if (_log_level & (1 << i)) {
+		ret = true;
+	}
+	return ret;
 };

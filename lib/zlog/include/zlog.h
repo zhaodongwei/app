@@ -40,6 +40,7 @@ private:
 	ZLog(const char* path);
 	ZLog();
 	int _write_type(zlogtype type);
+	bool _show(zlogtype type);
 	FILE* _fs;
 	int _log_level;
 	const char* _output;

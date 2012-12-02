@@ -13,7 +13,10 @@
 
 int main() {
 	zlog_load("./conf/zlog.conf");
-	zlog(ZNOTICE, "another log");
+	zlog(ZDEBUG, "debug log");
+	zlog(ZNOTICE, "notice log");
+	zlog(ZWARNNING, "warnning log");
+	zlog(ZFATAL, "fatal log");
 	zlog_close();
 	return 0;
 }

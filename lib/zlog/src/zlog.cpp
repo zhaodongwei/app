@@ -83,10 +83,10 @@ ZLog* ZLog::get_instance(const char* path) {
 };
 
 ZLog::~ZLog() {
-	if (NULL != _fs && stdout != _fs) {
+	if (NULL != _fs && stdout != _fs && stderr != _fs) {
 		fclose(_fs);
-		_fs = NULL;
 	}
+	_fs = NULL;
 	_pzlog = NULL;
 }
 
@@ -138,7 +138,7 @@ int ZLog::write_log(const char* info) {
 
 bool ZLog::_show(zlogtype type) {
 	bool ret = false;
-	int i = 4 - (int)type;
+	int i = (int)ZFATAL - (int)type;
 	if (_log_level & (1 << i)) {
 		ret = true;
 	}

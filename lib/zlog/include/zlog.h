@@ -43,7 +43,6 @@ private:
 	bool _show(zlogtype type);
 	FILE* _fs;
 	int _log_level;
-	const char* _output;
 	static ZLog* _pzlog;
 };
 

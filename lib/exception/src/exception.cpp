@@ -32,7 +32,6 @@ exception::exception(fatal_type type, const char* info, ...) {
 	va_list args;
 	va_start(args, info);
 	vsprintf(buffer, info, args);
-	va_end(args);
 	fprintf(stdout, "%s\n", buffer);
 };
 

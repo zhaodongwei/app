@@ -67,7 +67,7 @@ ZLog::ZLog(const char* path) {
 	else if (conf.has_key("output")) {
 		_fs = fopen(conf["output"].to_cstr(), "a+");
 		if (NULL == _fs) {
-			throw exception("NOT_EXIST", "open %s fail", _output);
+			throw exception(NOT_EXIST, "open %s fail", conf["output"].to_cstr());
 		}
 	}
 	else {

@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #include "exception.h"
 #include "configure.h"
@@ -39,6 +41,14 @@ int zlog_close() {
 		delete ins;
 	}
 	return ZLOG_SUCC;
+};
+
+void* ZLog::_write_log_thread(void* pchar) {
+	FILE* _fs_thread = (FILE*)(((void**)pchar)[0]);
+	char* info = (char*)(((void**)pchar)[1]);
+	//fprintf(stdout, "[thread]%s\n", info);
+	fprintf(_fs_thread, "[thread]%s\n", info);
+	pthread_exit(ZLOG_SUCC);
 };
 
 ZLog::ZLog() {
@@ -97,19 +107,19 @@ ZLog* ZLog::get_instance() {
 	return _pzlog;
 };
 
-int ZLog::_write_type(zlogtype type) {
+int ZLog::_write_type(zlogtype type, char* line) {
 	switch(type) {
 		case ZDEBUG:
-			fprintf(_fs, "[DEBUG]");
+			strcpy(line, "[DEBUG]");
 			break;
 		case ZNOTICE:
-			fprintf(_fs, "[NOTICE]");
+			strcpy(line, "[NOTICE]");
 			break;
 		case ZWARNNING:
-			fprintf(_fs, "[WARNNING]");
+			strcpy(line, "[WARNNING]");
 			break;
 		case ZFATAL:
-			fprintf(_fs, "[FATAL]");
+			strcpy(line, "[FATAL]");
 			break;
 	};
 	time_t now;
@@ -119,16 +129,25 @@ int ZLog::_write_type(zlogtype type) {
 	char today[1024];
 	sprintf(today, "%d-%02d-%02d",  tmp->tm_year+1900, tmp->tm_mon + 1, tmp->tm_mday);
 	sprintf(today + strlen(today), " %02d:%02d:%02d", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
-	fprintf(_fs, " * %s * ", today);
+	sprintf(line + strlen(line), " * %s * ", today);
 	return ZLOG_SUCC;
 };
 
+char gline[1024];
 int ZLog::write_log(zlogtype type, const char* info) {
 	if (!_show(type)) {
 		return ZLOG_SUCC;
 	}
-	_write_type(type);
-	fprintf(_fs, "%s\n", info);
+	_write_type(type, gline);
+	sprintf(gline + strlen(gline), "%s", info);
+	fprintf(_fs, "%s\n", gline);
+	
+	void* pchar[2];
+	pchar[0] = (void*)_fs;
+	pchar[1] = (void*)gline;
+	pthread_t pid;
+	pthread_create(&pid, NULL, _write_log_thread, (void*)pchar);
+	usleep(1);
 	return ZLOG_SUCC;
 };
 

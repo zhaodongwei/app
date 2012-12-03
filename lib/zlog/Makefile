@@ -2,7 +2,7 @@ all : zlog libzlog.a
 .PHONY: all
 
 zlog : zlog.o test.o
-	g++ -o zlog zlog.o test.o ../exception/libexception.a ../configure/libconfigure.a
+	g++ -o zlog zlog.o test.o ../exception/libexception.a ../configure/libconfigure.a -lpthread
 
 zlog.o : src/zlog.cpp include/*
 	g++ -c -I ./include -I ../exception/include -I ../configure/include src/zlog.cpp

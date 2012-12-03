@@ -39,8 +39,9 @@ public:
 private:
 	ZLog(const char* path);
 	ZLog();
-	int _write_type(zlogtype type);
+	int _write_type(zlogtype type, char* line);
 	bool _show(zlogtype type);
+	static void* _write_log_thread(void* pchar);
 	FILE* _fs;
 	int _log_level;
 	static ZLog* _pzlog;

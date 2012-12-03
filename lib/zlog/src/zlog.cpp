@@ -13,47 +13,79 @@
 #include <time.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "exception.h"
 #include "configure.h"
 #include "zlog.h"
 
 ZLog* ZLog::_pzlog;
+std::vector<char*> _pool;
+std::vector<char*> _task;
+char* pmem;
+int _max_task_num;
+int _max_task_length;
+pthread_cond_t qready;
+pthread_mutex_t qlock;
+pthread_mutex_t task_lock;
 
 int zlog(zlogtype type, const char* format, ...) {
-	char line[1024];
 	va_list va;
 	va_start(va, format);
-	vsprintf(line, format, va);
+	vsnprintf(pmem, _max_task_length, format, va);
 	ZLog* ins = ZLog::get_instance();
-	ins->write_log(type, line);
+	ins->write_log(type, pmem);
 	return ZLOG_SUCC;
 };
 
 int zlog_load(const char* path) {
 	ZLog::get_instance(path);
+	zlog(ZNOTICE, "-------------open log--------------");
 	return ZLOG_SUCC;
 };
 
 int zlog_close() {
+	usleep(10);
+	pthread_mutex_lock(&qlock);
+	pthread_mutex_lock(&task_lock);
+	pthread_cond_destroy(&qready);
+	pthread_mutex_destroy(&qlock);
+	pthread_mutex_destroy(&task_lock);
+
 	ZLog* ins = ZLog::get_instance();
 	if (NULL != ins) {
 		delete ins;
 	}
+	if (NULL != pmem) {
+		delete pmem;
+	}
 	return ZLOG_SUCC;
 };
 
-void* ZLog::_write_log_thread(void* pchar) {
-	FILE* _fs_thread = (FILE*)(((void**)pchar)[0]);
-	char* info = (char*)(((void**)pchar)[1]);
-	//fprintf(stdout, "[thread]%s\n", info);
-	fprintf(_fs_thread, "[thread]%s\n", info);
+void* _write_log_thread(void* pfile) {
+	FILE* _fs_thread = (FILE*)pfile;
+	for(;;) {
+		pthread_mutex_lock(&qlock);
+		while (_task.size() == 0) {
+			pthread_cond_wait(&qready, &qlock);
+		}
+		pthread_mutex_lock(&task_lock);
+		char* tmp = _task.front();
+		_task.erase(_task.begin());
+		pthread_mutex_unlock(&task_lock);
+		fprintf(_fs_thread, "%s\n", tmp);
+		_pool.push_back(tmp);
+		pthread_mutex_unlock(&qlock);
+	}
 	pthread_exit(ZLOG_SUCC);
 };
 
 ZLog::ZLog() {
 	_log_level = 0;
 	_fs = stdout;
+	_max_task_length = 1024;
+	_max_task_num = 100;
+	_create_pool();
 };
 
 ZLog::ZLog(const char* path) {
@@ -83,6 +115,48 @@ ZLog::ZLog(const char* path) {
 	else {
 		_fs = stdout;
 	}
+
+	if (conf.has_key("max_task_length")) {
+		_max_task_length = conf["max_task_length"].to_int();
+	}
+	else {
+		_max_task_length = 1024;
+	}
+
+	if (conf.has_key("max_task_num")) {
+		_max_task_num = conf["max_task_num"].to_int(); 
+	}
+	else {
+		_max_task_num = 100;
+	}
+	
+	_create_pool();
+	
+};
+
+int ZLog::_create_pool() {
+	pmem = (char*)malloc((_max_task_num + 1) * _max_task_length);
+	if (NULL == pmem) {
+		throw exception(UNEXPECTED, "allocate mem for log fail");
+	}
+	_pool.reserve(_max_task_num);
+	_task.reserve(_max_task_num);
+
+	int i = 0;
+	while (i++ < _max_task_num) {
+		_pool.push_back(pmem + i * _max_task_length);
+	}
+	pthread_cond_init(&qready, NULL);
+	pthread_mutex_init(&qlock, NULL);
+	pthread_mutex_init(&task_lock, NULL);
+
+	pthread_t pid;
+	int ret = pthread_create(&pid, NULL, _write_log_thread, (void*)_fs);
+	if (0 != ret) {
+		throw exception(UNEXPECTED, "init log thread fail");
+	}
+	
+	return ZLOG_SUCC;
 };
 
 ZLog* ZLog::get_instance(const char* path) {
@@ -126,28 +200,36 @@ int ZLog::_write_type(zlogtype type, char* line) {
 	tm* tmp;
 	time(&now);
 	tmp = localtime(&now);	
-	char today[1024];
-	sprintf(today, "%d-%02d-%02d",  tmp->tm_year+1900, tmp->tm_mon + 1, tmp->tm_mday);
-	sprintf(today + strlen(today), " %02d:%02d:%02d", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
-	sprintf(line + strlen(line), " * %s * ", today);
+	sprintf(line + strlen(line), " * %d-%02d-%02d",  tmp->tm_year+1900, tmp->tm_mon + 1, tmp->tm_mday);
+	sprintf(line + strlen(line), " %02d:%02d:%02d * ", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
 	return ZLOG_SUCC;
 };
 
-char gline[1024];
 int ZLog::write_log(zlogtype type, const char* info) {
 	if (!_show(type)) {
 		return ZLOG_SUCC;
 	}
-	_write_type(type, gline);
-	sprintf(gline + strlen(gline), "%s", info);
-	fprintf(_fs, "%s\n", gline);
-	
-	void* pchar[2];
-	pchar[0] = (void*)_fs;
-	pchar[1] = (void*)gline;
-	pthread_t pid;
-	pthread_create(&pid, NULL, _write_log_thread, (void*)pchar);
-	usleep(1);
+	char* tmp;
+	pthread_mutex_lock(&qlock);
+	if (0 == _pool.size()) {
+		tmp = NULL;
+	}
+	else {
+		tmp = _pool.back();
+		_pool.pop_back();
+		_write_type(type, tmp);
+		snprintf(tmp + strlen(tmp), _max_task_length - strlen(tmp), "%s", info);
+		pthread_mutex_lock(&task_lock);
+		_task.push_back(tmp);
+		pthread_mutex_unlock(&task_lock);
+	}
+	pthread_mutex_unlock(&qlock);
+	if (NULL == tmp) {
+		fprintf(stdout, "WARNNING ** no buffer for log\n");
+		return ZLOG_ERROR;
+	}
+	pthread_cond_signal(&qready);
+
 	return ZLOG_SUCC;
 };
 

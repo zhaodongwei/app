@@ -8,15 +8,19 @@
  ***********************************************************/
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "zlog.h"
 
 int main() {
 	zlog_load("./conf/zlog.conf");
-	zlog(ZDEBUG, "debug log");
-	zlog(ZNOTICE, "notice log");
-	zlog(ZWARNNING, "warnning log");
-	zlog(ZFATAL, "fatal log");
+	int i = 1;
+	while (i--) {
+		zlog(ZDEBUG, "debug log");
+		zlog(ZNOTICE, "notice log");
+		zlog(ZWARNNING, "warnning log");
+		zlog(ZFATAL, "fatal log");
+	}
 	zlog_close();
 	return 0;
 }

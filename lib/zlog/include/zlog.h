@@ -11,6 +11,8 @@
 #define _ZLOG_H_
 
 #include <stdio.h>
+#include <vector>
+#include <pthread.h>
 
 #define ZLOG_SUCC 0
 #define ZLOG_ERROR -1
@@ -27,6 +29,8 @@ int zlog(zlogtype type, const char* format, ...);
 int zlog_load(const char* path);
 int zlog_close();
 
+void* _write_log_thread(void* pfile);
+
 class ZLog {
 
 public:
@@ -41,7 +45,7 @@ private:
 	ZLog();
 	int _write_type(zlogtype type, char* line);
 	bool _show(zlogtype type);
-	static void* _write_log_thread(void* pchar);
+	int _create_pool();
 	FILE* _fs;
 	int _log_level;
 	static ZLog* _pzlog;

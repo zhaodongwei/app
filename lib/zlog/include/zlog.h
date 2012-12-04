@@ -28,6 +28,7 @@ int zlog_load(const char* path);
 int zlog_close();
 
 void* _write_log_thread(void* pfile);
+void close_log(void* pfile);
 
 class ZLog {
 
@@ -47,6 +48,16 @@ private:
 	FILE* _fs;
 	int _log_level;
 	static ZLog* _pzlog;
+	class ZGarbage {
+	public:
+		~ZGarbage() {
+			if (NULL != ZLog::_pzlog) {
+				delete _pzlog;
+				_pzlog = NULL;
+			}
+		}
+	};
+	static ZGarbage _z_garbage;
 };
 
 #endif //_ZLOG_H_

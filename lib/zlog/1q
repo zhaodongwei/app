@@ -34,6 +34,11 @@ pthread_cond_t qready;
 pthread_mutex_t qlock;
 pthread_mutex_t task_lock;
 
+void close_log(void* pfile) {
+	fprintf(stdout, "bye thread, close_log\n");
+	usleep(10);
+};
+
 int zlog(zlogtype type, const char* format, ...) {
 	va_list va;
 	va_start(va, format);
@@ -51,6 +56,11 @@ int zlog_load(const char* path) {
 
 int zlog_close() {
 	usleep(10);
+	int ret = pthread_cancel(tid);
+	usleep(10);
+	if (0 != ret) {
+		fprintf(stdout, "cancel thread fail\n");
+	}
 	pthread_cond_destroy(&qready);
 	pthread_mutex_destroy(&qlock);
 	pthread_mutex_destroy(&task_lock);
@@ -61,6 +71,7 @@ int zlog_close() {
 };
 
 void* _write_log_thread(void* pfile) {
+	pthread_cleanup_push(close_log, pfile);
 	FILE* _fs_thread = (FILE*)pfile;
 	for(;;) {
 		pthread_mutex_lock(&qlock);
@@ -76,7 +87,7 @@ void* _write_log_thread(void* pfile) {
 		_pool.push_back(tmp);
 		pthread_mutex_unlock(&qlock);
 	}
-	return (void*)0;
+	pthread_cleanup_pop(0);
 };
 
 ZLog::ZLog() {
@@ -164,6 +175,7 @@ ZLog* ZLog::get_instance(const char* path) {
 };
 
 ZLog::~ZLog() {
+	fprintf(stdout, "bye zlog\n");
 	if (NULL != _fs && stdout != _fs && stderr != _fs) {
 		fclose(_fs);
 	}

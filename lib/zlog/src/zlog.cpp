@@ -14,6 +14,8 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <vector>
+#include <deque>
 
 #include "exception.h"
 #include "configure.h"
@@ -21,7 +23,7 @@
 
 ZLog* ZLog::_pzlog;
 std::vector<char*> _pool;
-std::vector<char*> _task;
+std::deque<char*> _task;
 char* pmem;
 int _max_task_num;
 int _max_task_length;
@@ -70,8 +72,9 @@ void* _write_log_thread(void* pfile) {
 			pthread_cond_wait(&qready, &qlock);
 		}
 		pthread_mutex_lock(&task_lock);
-		char* tmp = _task.front();
-		_task.erase(_task.begin());
+		char* tmp;
+		tmp = _task.front();
+		_task.pop_front();
 		pthread_mutex_unlock(&task_lock);
 		fprintf(_fs_thread, "%s\n", tmp);
 		_pool.push_back(tmp);
@@ -97,7 +100,7 @@ ZLog::ZLog(const char* path) {
 		_log_level = conf["log_level"].to_int();	
 	}
 	else {
-		_log_level = 0;
+		_log_level = 7;
 	}
 	
 	if (conf.has_key("output") && !strcmp(conf["output"].to_cstr(), "stdout")) {
@@ -116,15 +119,15 @@ ZLog::ZLog(const char* path) {
 		_fs = stdout;
 	}
 
-	if (conf.has_key("max_task_length")) {
-		_max_task_length = conf["max_task_length"].to_int();
+	if (conf.has_key("buffer_log_length")) {
+		_max_task_length = conf["buffer_log_length"].to_int();
 	}
 	else {
 		_max_task_length = 1024;
 	}
 
-	if (conf.has_key("max_task_num")) {
-		_max_task_num = conf["max_task_num"].to_int(); 
+	if (conf.has_key("buffer_log_num")) {
+		_max_task_num = conf["buffer_log_num"].to_int(); 
 	}
 	else {
 		_max_task_num = 100;
@@ -139,8 +142,7 @@ int ZLog::_create_pool() {
 	if (NULL == pmem) {
 		throw exception(UNEXPECTED, "allocate mem for log fail");
 	}
-	_pool.reserve(_max_task_num);
-	_task.reserve(_max_task_num);
+	_pool.reserve(_max_task_num + 1);
 
 	int i = 0;
 	while (i++ < _max_task_num) {
@@ -217,10 +219,15 @@ int ZLog::write_log(zlogtype type, const char* info) {
 	else {
 		tmp = _pool.back();
 		_pool.pop_back();
-		_write_type(type, tmp);
-		snprintf(tmp + strlen(tmp), _max_task_length - strlen(tmp), "%s", info);
-		pthread_mutex_lock(&task_lock);
-		_task.push_back(tmp);
+		if (NULL == tmp) {
+			fprintf(stdout, "WARNNING ** NULL ptr\n");
+		}
+		else {
+			_write_type(type, tmp);
+			snprintf(tmp + strlen(tmp), _max_task_length - strlen(tmp), "%s", info);
+			pthread_mutex_lock(&task_lock);
+			_task.push_back(tmp);
+		}
 		pthread_mutex_unlock(&task_lock);
 	}
 	pthread_mutex_unlock(&qlock);

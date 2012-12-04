@@ -11,8 +11,6 @@
 #define _ZLOG_H_
 
 #include <stdio.h>
-#include <vector>
-#include <pthread.h>
 
 #define ZLOG_SUCC 0
 #define ZLOG_ERROR -1

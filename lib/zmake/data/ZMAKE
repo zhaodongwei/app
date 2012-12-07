@@ -1,3 +1,0 @@
-root_path = "./././"
-head_files = "./include/*.h"
-source_file = "./src/*.cpp"

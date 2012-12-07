@@ -4,3 +4,27 @@
 # des : zmake file, python script
 # author : zhaodongwei (joodaw@gmail.com)
 # org : nju
+
+import os
+import sys
+
+mode = 0
+for i in sys.argv:
+	if (i == "-s"):
+		mode = 1
+	if (i == "-n"):
+		mode = 2
+	if (i == "-u"):
+		mode = 3
+
+if (1 == mode):
+	print "set up mode, copying files"
+	os.system("cp zmake /usr/bin")
+elif (2 == mode):
+	print "initialize mode, building ZMAKE"
+elif (3 == mode):
+	print "update lib mode, building libs"
+elif (0 == mode):
+	print "makefile mode, generating Makefile"
+else:
+	print "error occurs"

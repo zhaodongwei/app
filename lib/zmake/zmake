@@ -7,6 +7,7 @@
 
 import os
 import sys
+import shutil
 
 mode = 0
 for i in sys.argv:
@@ -19,7 +20,8 @@ for i in sys.argv:
 
 if (1 == mode):
 	print "set up mode, copying files"
-	os.system("cp zmake /usr/bin")
+	#os.system("cp zmake /usr/bin")
+	shutil.copyfile("./zmake", "/usr/bin/zmake")
 elif (2 == mode):
 	print "initialize mode, building ZMAKE"
 elif (3 == mode):

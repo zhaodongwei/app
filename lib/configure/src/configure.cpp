@@ -303,7 +303,7 @@ int Configure::_regulate_value(char* token, char* src) {
 					*token = '\"';
 					break;
 				default:
-					throw exception(UNEXPECTED, "unexpected char while processing %s:", src);
+					throw exception(UNEXPECTED, "unknown meaning of \"\\%c\"", *src);
 			};
 			token++;
 			src++;
@@ -410,6 +410,15 @@ bool Configure::get_next_line(char* line, int length) {
 	if (NULL != fgets(line, length, _fs)) {
 		ret = true;
 	}
+	while (ret && *line == '#') {
+		if (NULL != fgets(line, length, _fs)) {
+			ret = true;
+		}
+		else {
+			ret = false;
+		}
+	}
+
 	int len = strlen(line);
 	while (ret && line[len - 2] == '\\') {
 		if (NULL != fgets(line + len - 2, CONF_LINE_NUM - len, _fs)) {
@@ -420,10 +429,14 @@ bool Configure::get_next_line(char* line, int length) {
 			ret = false;
 		}
 	}
+	if (false == ret || 0 == len) {
+		return false;
+	}
+
 	if (line[len - 1] == '\n' || line[len -1] == '\r') {
 		line[len - 1] = 0;
 	}
-	return ret;
+	return true;
 };
 
 int Configure::_release(conf_item* conf_tree) {

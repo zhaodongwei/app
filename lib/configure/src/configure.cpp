@@ -23,6 +23,10 @@ Configure::Configure(const char* conf_file) {
 	}
 	_root = NULL;
 	_parse();
+	if (NULL != _fs) {
+		fclose(_fs);
+	}
+	_fs = NULL;
 };
 
 Configure::Configure(const std::string& conf_file) {
@@ -33,13 +37,13 @@ Configure::Configure(const std::string& conf_file) {
 	}
 	_root = NULL;
 	_parse();
-};
-
-Configure::~Configure() {
 	if (NULL != _fs) {
 		fclose(_fs);
 	}
 	_fs = NULL;
+};
+
+Configure::~Configure() {
 	_release(_root);
 };
 

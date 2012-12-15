@@ -16,6 +16,7 @@
 namespace configure {
 
 Configure::Configure(const char* conf_file) {
+	_file.append(conf_file);
 	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
@@ -30,6 +31,7 @@ Configure::Configure(const char* conf_file) {
 };
 
 Configure::Configure(const std::string& conf_file) {
+	_file.append(conf_file);
 	_fs = fopen(conf_file.c_str(), "r");
 	if (NULL == _fs) {
 		fprintf(stderr, "conf file open error\n");
@@ -45,6 +47,23 @@ Configure::Configure(const std::string& conf_file) {
 
 Configure::~Configure() {
 	_release(_root);
+};
+
+int Configure::reload() {
+	_fs = fopen(_file.c_str(), "r");
+	_release(_root);
+	_root = NULL;
+	if (NULL == _fs) {
+		fprintf(stderr, "conf file open error\n");
+		throw exception(NOT_EXIST, "%s", _file.c_str());
+	}
+	_layers.clear();
+	_parse();
+	if (NULL != _fs) {
+		fclose(_fs);
+	}
+	_fs = NULL;
+	return CONF_SUCC;
 };
 
 nodetype Configure::_check_type(char* src) {

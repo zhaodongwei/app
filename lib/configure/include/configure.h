@@ -30,6 +30,7 @@ public:
 	conf_item& operator[](const char* item);
 	conf_item& operator[](const std::string item);
 	conf_item& operator[](int item);
+	int reload();
 	int size();
 	bool has_key(const char* key);
 	bool has_key(const std::string& key);
@@ -38,6 +39,7 @@ public:
 
 private:
 	FILE* _fs;
+	std::string _file;
 	conf_item* _root;
 	std::vector<conf_item*> _layers;
 	nodetype _check_type(char* src);

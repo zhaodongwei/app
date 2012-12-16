@@ -1,5 +1,9 @@
 /* See md5.c for explanation and copyright information.  */
 
+/* verified by zhaodongwei@Nanjing University, joodaw@gmail.com
+   for personal use, all rights belong to original authors.
+   date: 2012.12.16                                      */
+
 #ifndef MD5_H
 #define MD5_H
 
@@ -21,6 +25,8 @@ void MD5Update(struct MD5Context *context, unsigned char const *buf, unsigned le
 void MD5Final(unsigned char digest[16], struct MD5Context *context);
 void MD5Transform(uint32 buf[4], const unsigned char in[64]);
 
+uint32 getu32 (const unsigned char *addr);
+void putu32 (uint32 data, unsigned char *addr);
 /*
  * This is needed to make RSAREF happy on some MS-DOS compilers.
  */

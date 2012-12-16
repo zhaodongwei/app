@@ -35,28 +35,25 @@
    is possible they should be macros for speed, but I would be
    surprised if they were a performance bottleneck for MD5.  */
 
-static uint32 
-getu32 (const unsigned char *addr)
+uint32 getu32 (const unsigned char *addr)
 {
 	return (((((unsigned long)addr[3] << 8) | addr[2]) << 8)
 		| addr[1]) << 8 | addr[0];
-}
+};
 
-static void
-putu32 (uint32 data, unsigned char *addr)
+void putu32 (uint32 data, unsigned char *addr)
 {
 	addr[0] = (unsigned char)data;
 	addr[1] = (unsigned char)(data >> 8);
 	addr[2] = (unsigned char)(data >> 16);
 	addr[3] = (unsigned char)(data >> 24);
-}
+};
 
 /*
  * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
  * initialization constants.
  */
-void
-MD5Init(struct MD5Context *ctx)
+void MD5Init(struct MD5Context *ctx)
 {
 	ctx->buf[0] = 0x67452301;
 	ctx->buf[1] = 0xefcdab89;
@@ -65,14 +62,13 @@ MD5Init(struct MD5Context *ctx)
 
 	ctx->bits[0] = 0;
 	ctx->bits[1] = 0;
-}
+};
 
 /*
  * Update context to reflect the concatenation of another buffer full
  * of bytes.
  */
-void
-MD5Update(struct MD5Context *ctx, 
+void MD5Update(struct MD5Context *ctx, 
      unsigned char const *buf,
      unsigned len)
 {
@@ -115,7 +111,7 @@ MD5Update(struct MD5Context *ctx,
 	/* Handle any remaining bytes of data. */
 
 	memcpy(ctx->in, buf, len);
-}
+};
 
 /*
  * Final wrapup - pad to 64-byte boundary with the bit pattern 
@@ -163,7 +159,7 @@ MD5Final(
 	putu32(ctx->buf[2], digest + 8);
 	putu32(ctx->buf[3], digest + 12);
 	memset(ctx, 0, sizeof(ctx));	/* In case it's sensitive */
-}
+};
 
 #ifndef ASM_MD5
 
@@ -273,35 +269,7 @@ MD5Transform(
 	buf[1] += b;
 	buf[2] += c;
 	buf[3] += d;
-}
+};
+
 #endif
-
-/* Simple test program.  Can use it to manually run the tests from
-   RFC1321 for example.  */
-
-int
-main (int argc, char **argv)
-{
-	struct MD5Context context;
-	unsigned char checksum[16];
-	int i;
-	
-	if (argc < 2)
-	{
-		fprintf (stderr, "usage: %s string-to-hash\n", argv[0]);
-		return (1);
-	}
-	
-	printf ("MD5 (\"%s\") = ", argv[1]);
-	MD5Init (&context);
-	MD5Update (&context, (unsigned char*)argv[1], strlen (argv[1]));
-	MD5Final (checksum, &context);
-	for (i = 0; i < 16; i++)
-	{
-		printf ("%02x", (unsigned int) checksum[i]);
-	}
-	printf ("\n");
-	
-	return 0;
-}
 

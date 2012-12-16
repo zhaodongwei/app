@@ -13,11 +13,14 @@
 #include <stdio.h>
 #include <string>
 
-typedef int int32;
-typedef long long int64;
+typedef unsigned int zint32;
+typedef unsigned long long zint64;
 
-int create_sign(int64 & sign1, int64& sign2, const char* pchar);
-int create_sign(int64 & sign1, int64& sign2, const std::string& pchar);
+int create_sign(zint64 & sign1, zint64& sign2, const char* pchar);
+int create_sign(zint64 & sign1, zint64& sign2, const std::string& pchar);
+
+int create_sign(zint64 & sign1, zint64& sign2, const char* pchar, int file);
+int create_sign(zint64 & sign1, zint64& sign2, const std::string& pchar, int file);
 
 #endif //#ifndef _SIGN_H_
 

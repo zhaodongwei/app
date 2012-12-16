@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "tools.h"
+#include "zlib.h"
 
-namespace tools {
+namespace zlib {
 
 ScopeFile::ScopeFile(const char* file, const char* mode) {
 	if (NULL == file || NULL == mode) {

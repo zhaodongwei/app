@@ -2,17 +2,17 @@
  * Copyright: zhaodongwei@nanjing university
  * author: zhaodongwei(joodaw@gmail.com)
  * 
- * file: tools.h
+ * file: zlib.h
  * date: 2012-11-16
  * desc: some useful tools
  ***********************************************************/
 
-#ifndef _TOOLS_H_
-#define _TOOLS_H_
+#ifndef _ZLIB_H_
+#define _ZLIB_H_
 
 #include <stdio.h>
 
-namespace tools{
+namespace zlib{
 
 class ScopeFile{
 
@@ -30,6 +30,6 @@ int count_sep(const char* line, const char* sep);
 
 };
 
-#endif //#ifndef _TOOLS_H_
+#endif //#ifndef _ZLIB_H_
 
 

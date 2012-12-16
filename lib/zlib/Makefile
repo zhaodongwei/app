@@ -1,14 +1,16 @@
-objs = tools.o main.o
-all: tools
+objs = zlib.o main.o sign.o
+all: zlib
 .PHONY: all
 
-tools: $(objs)
-	g++ -o tools $(objs)
+zlib: $(objs)
+	g++ -o zlib $(objs)
 
 main.o: test/main.cpp include/* 
 	g++ -I ./include -c test/main.cpp
-tools.o: src/tools.cpp include/*
-	g++ -I ./include -c src/tools.cpp
+zlib.o: src/zlib.cpp include/*
+	g++ -I ./include -c src/zlib.cpp
+sign.o: src/sign.cpp include/*
+	g++ -I ./include -c src/sign.cpp
 
 clean:
-	rm -rf tools $(objs)
+	rm -rf zlib $(objs)

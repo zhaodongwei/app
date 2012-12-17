@@ -51,6 +51,7 @@ public:
 	int add(zint64 sign1, zint64 sign2, int value);
 	int remove(zint64 sign1, zint64 sign2);
 	int has(zint64 sign1, zint64 sign2);
+	int has(zint64 sign1, zint64 sign2, int& value);
 
 private:
 	std::map<KEY, int> _dict;

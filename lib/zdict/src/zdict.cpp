@@ -39,4 +39,12 @@ int ZDict::has(zint64 sign1, zint64 sign2) {
 	return ZDICT_EXIST;
 };
 
+int ZDict::has(zint64 sign1, zint64 sign2, int& value) {
+	if (_dict.end() == _dict.find(KEY(sign1, sign2))) {
+		return ZDICT_NOTEXIST;
+	}
+	value = _dict[KEY(sign1, sign2)];
+	return ZDICT_EXIST;
+};
+
 };

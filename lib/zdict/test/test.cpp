@@ -17,6 +17,10 @@ int main() {
 	if (ZDICT_EXIST == dict.has(1, 2)) {
 		fprintf(stdout, "have key (%d,%d)\n", 1, 2);
 	}
+	dict.remove(1, 2);
+	if (ZDICT_EXIST != dict.has(1, 2)) {
+		fprintf(stdout, "don't have key (%d,%d)\n", 1, 2);
+	}
 	if (ZDICT_EXIST != dict.has(2, 2)) {
 		fprintf(stdout, "don't have key (%d,%d)\n", 2, 2);
 	}

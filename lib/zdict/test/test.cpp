@@ -13,9 +13,10 @@
 
 int main() {
 	zdict::ZDict dict;
-	dict.add(1, 2, 8);
-	if (ZDICT_EXIST == dict.has(1, 2)) {
-		fprintf(stdout, "have key (%d,%d)\n", 1, 2);
+	dict.add(1, 2, 10);
+	int value;
+	if (ZDICT_EXIST == dict.has(1, 2, value)) {
+		fprintf(stdout, "have key (%d,%d), value: %d\n", 1, 2, value);
 	}
 	dict.remove(1, 2);
 	if (ZDICT_EXIST != dict.has(1, 2)) {

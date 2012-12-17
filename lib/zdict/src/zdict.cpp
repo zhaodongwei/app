@@ -40,10 +40,11 @@ int ZDict::has(zint64 sign1, zint64 sign2) {
 };
 
 int ZDict::has(zint64 sign1, zint64 sign2, int& value) {
-	if (_dict.end() == _dict.find(KEY(sign1, sign2))) {
+	std::map<KEY, int>::iterator iter = _dict.find(KEY(sign1, sign2));
+	if (_dict.end() == iter) {
 		return ZDICT_NOTEXIST;
 	}
-	value = _dict[KEY(sign1, sign2)];
+	value = iter->second;
 	return ZDICT_EXIST;
 };
 

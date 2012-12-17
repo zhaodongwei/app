@@ -1,4 +1,4 @@
-all: zdict
+all: zdict lib
 .PHONY: all
 
 zdict: zdict.o test.o
@@ -10,5 +10,8 @@ zdict.o : src/zdict.cpp include/*
 test.o : test/test.cpp include/*
 	g++ -I ./include -c test/test.cpp
 
+lib : zdict.o
+	ar cqs libzdict.a zdict.o
+
 clean:
-	rm test.o zdict.o zdict
+	rm test.o zdict.o zdict libzdict.a

@@ -86,3 +86,31 @@ int create_sign(zint64 & sign1, zint64& sign2, const char* pchar, int file) {
 int create_sign(zint64 & sign1, zint64& sign2, const std::string& pchar, int file) {
 	create_sign(sign1, sign2, pchar.c_str(), 0);
 };
+
+int create_sign(zint64 & sign1, zint64& sign2, unsigned int len, const char* pchar) {
+	if (NULL == pchar)
+	{
+		sign1 = sign2 = 0;
+		return -1;
+	}
+
+	struct MD5Context context;
+	unsigned char checksum[16];
+	int i;
+	unsigned int length = strlen(pchar);
+	if (len < length) {
+		length = len;
+	}
+	MD5Init(&context);
+	MD5Update(&context, (unsigned char*)pchar, length);
+	MD5Final(checksum, &context);
+	sign1 = getu32(checksum + 4);
+	sign1 = (sign1 << 32) | getu32(checksum);
+	sign2 = getu32(checksum + 12);
+	sign2 = (sign2 << 32) | getu32(checksum + 8);
+	return 0;
+};
+
+int create_sign(zint64 & sign1, zint64& sign2, unsigned int len, const std::string& pchar) {
+	return create_sign(sign1, sign2, len, pchar.c_str());
+};

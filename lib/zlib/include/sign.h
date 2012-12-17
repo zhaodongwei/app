@@ -22,5 +22,7 @@ int create_sign(zint64 & sign1, zint64& sign2, const std::string& pchar);
 int create_sign(zint64 & sign1, zint64& sign2, const char* pchar, int file);
 int create_sign(zint64 & sign1, zint64& sign2, const std::string& pchar, int file);
 
+int create_sign(zint64 & sign1, zint64& sign2, unsigned int len, const char* pchar);
+int create_sign(zint64 & sign1, zint64& sign2, unsigned int len, const std::string& pchar);
 #endif //#ifndef _SIGN_H_
 

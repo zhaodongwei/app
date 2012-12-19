@@ -31,6 +31,7 @@ public:
 	conf_item& operator[](const std::string item);
 	conf_item& operator[](int item);
 	int reload();
+	int save(const char* conf_file);
 	int size();
 	bool has_key(const char* key);
 	bool has_key(const std::string& key);

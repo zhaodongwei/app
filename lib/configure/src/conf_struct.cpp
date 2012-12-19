@@ -65,9 +65,11 @@ bool ConfStruct::add_to_tree() {
 	ConfStruct* bro = _father->get_last_child();
 	if (NULL == bro) {
 		_father->set_child(this);
+		_elder_brother = NULL;
 	}
 	else {
 		bro->set_brother(this);
+		_elder_brother = bro;
 	}
 	return true;
 };
@@ -291,6 +293,11 @@ bool ConfStruct::has_key(int key) {
 		return true;
 	}
 	return false;
+};
+
+int ConfStruct::save(FILE* new_fs, int depth) {
+	//need a reconstruction
+	return 0;
 };
 
 }

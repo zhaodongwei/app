@@ -65,6 +65,10 @@ public:
 		_brother = p_brother;
 		return p_brother;
 	};
+	
+	ConfStruct* get_elder_brother() {
+		return _elder_brother;
+	};
 
 	ConfStruct* get_father() const {
 		return _father;
@@ -102,6 +106,7 @@ public:
 	const char* to_cstr();
 
 	int size();
+	int save(FILE* new_fs, int depth);
 	bool has_key(const char* key);
 	bool has_key(const std::string& key);
 	bool has_key(int key);
@@ -115,6 +120,7 @@ private:
 	nodetype _node;
 	ConfStruct* _child;
 	ConfStruct* _brother;
+	ConfStruct* _elder_brother;
 	ConfStruct* _father;
 	ConfStruct* _shadow;
 	int init();

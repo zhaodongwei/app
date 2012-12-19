@@ -9,6 +9,7 @@
 
 #ifndef _CONF_NODETYPE_H_
 #define _CONF_NODETYPE_H_
+namespace configure {
 
 enum all_types{
 	INVALID = 0,
@@ -21,6 +22,9 @@ enum all_types{
 };
 
 typedef enum all_types nodetype; 
+
+};
+
 #endif //#ifndef _CONF_NODETYPE_H_
 
 

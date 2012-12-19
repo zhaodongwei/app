@@ -35,6 +35,7 @@ WordSeg::WordSeg(const std::string& pdict) {
 };
 
 WordSeg::WordSeg() {
+	_len = BUFF_LENGTH;
 	_line = (char*)malloc(_len + 1);
 	if (NULL == _line) {
 		throw exception("out of resource");

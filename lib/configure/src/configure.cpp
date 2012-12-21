@@ -145,7 +145,7 @@ int Configure::_parse() {
 		switch(line_type) {
 			case INVALID:
 				fprintf(stderr, "[parse] INVALID CONF LINE: %s\n", line);
-				throw exception(LOGIC, "invalid conf line: %s", line);
+				throw exception(UNEXPECTED, "invalid conf line: %s", line);
 				break;
 			case TRUNK:
 				ret = _parse_trunk(iter, pre_trunk_or_branch);
@@ -262,7 +262,7 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	expect(src, "[");
 	node->set_father(item);
 	if (CONF_ERROR == _parse_array(src, node)) {
-		throw exception(EXPECTED, "parse array error");
+		throw exception(MISSING, "parse array error");
 	}
 	if (*src == 0) {
 		return CONF_SUCC;

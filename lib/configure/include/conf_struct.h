@@ -24,7 +24,7 @@ public:
 	ConfStruct(const char* key, const char* value);
 	ConfStruct(nodetype node);
 	ConfStruct(const std::string& key, const std::string& value);
-	~ConfStruct();
+	virtual ~ConfStruct();
 
 	std::string get_key() const {
 		return _key;
@@ -38,14 +38,14 @@ public:
 		_key.append(key);
 	}
 
-	std::string get_value() const {
+	virtual std::string get_value() const {
 		return _value;
 	};
-	void set_value(const char* value_in) {
+	virtual void set_value(const char* value_in) {
 		_value.clear();
 		_value.append(value_in);
 	}
-	void set_value(const std::string& value) {
+	virtual void set_value(const std::string& value) {
 		_value.clear();
 		_value.append(value);
 	}
@@ -100,21 +100,21 @@ public:
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
 	
-	int to_int();
-	double to_double();
-	std::string to_string();
-	const char* to_cstr();
+	virtual int to_int();
+	virtual double to_double();
+	virtual std::string to_string();
+	virtual const char* to_cstr();
 
-	int size();
-	int save(FILE* new_fs, int depth);
-	bool has_key(const char* key);
-	bool has_key(const std::string& key);
-	bool has_key(int key);
+	virtual int size();
+	virtual int save(FILE* new_fs, int depth);
+	virtual bool has_key(const char* key);
+	virtual bool has_key(const std::string& key);
+	virtual bool has_key(int key);
 
-	ConfStruct& operator[](const char* key);
-	ConfStruct& operator[](int key);
+	virtual ConfStruct& operator[](const char* key);
+	virtual ConfStruct& operator[](int key);
 
-private:
+protected:
 	std::string _key;
 	std::string _value;
 	nodetype _node;

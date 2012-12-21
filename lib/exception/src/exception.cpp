@@ -40,22 +40,19 @@ void exception::_print_type(fatal_type type) {
 		case NOT_EXIST:
 			fprintf(stdout, "[FILE NOT EXIST]");
 			break;
-		case LOGIC:
-			fprintf(stdout, "[LOGIC]");
-			break;
 		case UNEXPECTED:
 			fprintf(stdout, "[UNEXPECTED]");
 			break;
-		case EXPECTED:
-			fprintf(stdout, "[EXPECTED]");
+		case MISSING:
+			fprintf(stdout, "[MISSING]");
 			break;
-		case NUMBERIC:
-			fprintf(stdout, "[NUMBERIC]");
+		case DIVIDE:
+			fprintf(stdout, "[DIVIDE]");
 			break;
-		case RUNTIME:
-			fprintf(stdout, "[RUN TIME]");
+		case OUT_OF_MEMORY:
+			fprintf(stdout, "[OUT OF MEMORY]");
 			break;
-		case RANGE:
+		case OUT_OF_RANGE:
 			fprintf(stdout, "[OUT OF RANGE]");
 			break;
 	}

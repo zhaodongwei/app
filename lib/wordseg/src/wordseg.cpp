@@ -21,7 +21,7 @@ WordSeg::WordSeg(const char* pdict) {
 	_len = BUFF_LENGTH;
 	_line = (char*)malloc(_len + 1);
 	if (NULL == _line) {
-		throw exception("out of resource");
+		throw exception(OUT_OF_MEMORY, "out of resource");
 	}
 };
 
@@ -30,7 +30,7 @@ WordSeg::WordSeg(const std::string& pdict) {
 	_len = BUFF_LENGTH;
 	_line = (char*)malloc(_len + 1);
 	if (NULL == _line) {
-		throw exception("out of resource");
+		throw exception(OUT_OF_MEMORY, "out of resource");
 	}
 };
 
@@ -38,7 +38,7 @@ WordSeg::WordSeg() {
 	_len = BUFF_LENGTH;
 	_line = (char*)malloc(_len + 1);
 	if (NULL == _line) {
-		throw exception("out of resource");
+		throw exception(OUT_OF_MEMORY, "out of resource");
 	}
 };
 

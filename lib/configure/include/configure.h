@@ -43,6 +43,7 @@ private:
 	std::string _file;
 	conf_item* _root;
 	std::vector<conf_item*> _layers;
+	int _init(const char* conf_file);
 	nodetype _check_type(char* src);
 	int _parse_branch(char*& src, conf_item*& item);
 	int _parse_trunk(char*& src, conf_item*& item);

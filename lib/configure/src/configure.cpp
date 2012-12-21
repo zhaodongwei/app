@@ -16,6 +16,18 @@
 namespace configure {
 
 Configure::Configure(const char* conf_file) {
+	_init(conf_file);
+};
+
+Configure::Configure(const std::string& conf_file) {
+	_init(conf_file.c_str());
+};
+
+Configure::~Configure() {
+	_release(_root);
+};
+
+int Configure::_init(const char* conf_file) {
 	_file.append(conf_file);
 	_fs = fopen(conf_file, "r");
 	if (NULL == _fs) {
@@ -28,25 +40,6 @@ Configure::Configure(const char* conf_file) {
 		fclose(_fs);
 	}
 	_fs = NULL;
-};
-
-Configure::Configure(const std::string& conf_file) {
-	_file.append(conf_file);
-	_fs = fopen(conf_file.c_str(), "r");
-	if (NULL == _fs) {
-		fprintf(stderr, "conf file open error\n");
-		throw exception(NOT_EXIST, "%s", conf_file.c_str());
-	}
-	_root = NULL;
-	_parse();
-	if (NULL != _fs) {
-		fclose(_fs);
-	}
-	_fs = NULL;
-};
-
-Configure::~Configure() {
-	_release(_root);
 };
 
 int Configure::reload() {
@@ -144,7 +137,6 @@ int Configure::_parse() {
 		int ret = CONF_SUCC;
 		switch(line_type) {
 			case INVALID:
-				fprintf(stderr, "[parse] INVALID CONF LINE: %s\n", line);
 				throw exception(UNEXPECTED, "invalid conf line: %s", line);
 				break;
 			case TRUNK:

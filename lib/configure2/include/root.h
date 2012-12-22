@@ -28,6 +28,7 @@ public:
 	int size();	
 	int save(FILE* fs, int depth);
 	bool has_key(const char* key);
+	bool has_key(const std::string& key);
 	bool has_key(int key);
 
 	ConfStruct* operator[](const char* key);

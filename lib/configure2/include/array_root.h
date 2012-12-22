@@ -2,13 +2,13 @@
  * Copyright: zhaodongwei@nanjing university
  * author: zhaodongwei(joodaw@gmail.com)
  * 
- * file: branch.h
+ * file: array_root.h
  * date: 2012-12-22
- * desc: branch node type
+ * desc: array root node type
  ***********************************************************/
 
-#ifndef _BRANCH_H_
-#define _BRANCH_H_
+#ifndef _ARRAY_ROOT_H_
+#define _ARRAY_ROOT_H_
 
 #include <stdio.h>
 #include <string>
@@ -19,11 +19,11 @@ namespace configure {
 
 class ConfNode;
 
-class Branch : public ConfStruct {
+class ArrayRoot : public ConfStruct {
 
 public:
-	Branch() : ConfStruct(BRANCH) {};
-	~Branch();
+	ArrayRoot() : ConfStruct(ARRAY_ROOT) {};
+	~ArrayRoot();
 	
 	int size();
 	int save(FILE* fs, int depth);
@@ -42,6 +42,6 @@ public:
 
 };
 
-#endif //_BRANCH_H_
+#endif //_ARRAY_ROOT_H_
 
 

@@ -111,7 +111,7 @@ nodetype Configure::_check_type(char* src) {
 			return INVALID;
 		}
 		if (CONF_SUCC == expect(src, "[")) {
-			return ARRAY_ITEM;
+			return ARRAY_ROOT;
 		}
 		else {
 			return ITEM;
@@ -123,10 +123,9 @@ nodetype Configure::_check_type(char* src) {
 };
 
 int Configure::_parse() {
-	_root = new conf_item;
+	_root = new ConfNode(ROOT);
 	_root->set_key("root");
-	_root->set_nodetype(ROOT);
-	conf_item* pre_trunk_or_branch = _root;
+	ConfNode* pre_trunk_or_branch = _root;
 	_layers.push_back(_root);
 
 	char line[CONF_LINE_NUM];
@@ -148,15 +147,15 @@ int Configure::_parse() {
 			case ITEM:
 				ret = _parse_item(iter, pre_trunk_or_branch);
 				break;
-			case ARRAY_ITEM:
-				ret = _parse_array_item(iter, pre_trunk_or_branch);
+			case ARRAY_ROOT:
+				ret = _parse_array_root(iter, pre_trunk_or_branch);
 				break;
 			default:
 				fprintf(stdout, "[parse] fatal error occurs: %s\n", line);
 				break;
 		}
 		if (CONF_ERROR == ret) {
-			//throw exception(UNEXPECTED, "unexpected conf contents: %s", line);
+			throw exception(UNEXPECTED, "unexpected conf contents: %s", line);
 		}
 	}
 };
@@ -170,15 +169,15 @@ int Configure::_get_layer(char*& src) {
 	return ret;
 };
 
-conf_item* Configure::_get_father_node(int layer) {
+ConfNode* Configure::_get_father_node(int layer) {
 	if (_layers.size() - 1 < layer) {
 		return NULL;
 	} 
 	return _layers[layer];
 };
 
-int Configure::_set_father_node(int layer, conf_item* node) {
-	if (NULL == node) {
+int Configure::_set_father_node(int layer, ConfNode* node) {
+	if (NULL == node || NULL == node->get_ins()) {
 		return CONF_ERROR;
 	}
 	if (_layers.size() - 1 < layer) {
@@ -193,18 +192,21 @@ int Configure::_set_father_node(int layer, conf_item* node) {
 	return CONF_SUCC;
 };
 
-int Configure::_parse_branch(char*& src, conf_item*& item) {
+int Configure::_parse_branch(char*& src, ConfNode*& item) {
 	expect(src, "[");
 	int layer = _get_layer(src);	
 	expect(src, "@");
 	char token[CONF_LINE_NUM];
 	get_token(src, token, CONF_LINE_NUM);
-	conf_item* node = new conf_item(BRANCH);
+	ConfNode* node = new ConfNode(BRANCH);
 	node->set_key(token);
 	expect(src, "]");
-	if (NULL == node->set_father(_get_father_node(layer))) {
+	ConfNode* ret;
+	ret = _get_father_node(layer);
+	if (NULL == ret) {
 		throw exception(UNEXPECTED, "unexpected layer of line: %s", src);
 	}
+	node->set_father(ret);
 	node->add_to_tree();
 	_set_father_node(layer, node);
 	item = node;
@@ -214,17 +216,20 @@ int Configure::_parse_branch(char*& src, conf_item*& item) {
 	return CONF_ERROR;
 };
 
-int Configure::_parse_trunk(char*& src, conf_item*& item) {
+int Configure::_parse_trunk(char*& src, ConfNode*& item) {
 	expect(src, "[");
 	int layer = _get_layer(src);	
 	char token[CONF_LINE_NUM];
 	get_token(src, token, CONF_LINE_NUM);
-	conf_item* node = new conf_item(TRUNK);
+	ConfNode* node = new ConfNode(TRUNK);
 	node->set_key(token);
 	expect(src, "]");
-	if (NULL == node->set_father(_get_father_node(layer))) {
+	ConfNode* ret;
+	ret = _get_father_node(layer);
+	if (NULL == ret) {
 		throw exception(UNEXPECTED, "unexpected layer of line: %s", src);
 	}
+	node->set_father(ret);
 	node->add_to_tree();
 	_set_father_node(layer, node);
 	item = node;
@@ -234,25 +239,31 @@ int Configure::_parse_trunk(char*& src, conf_item*& item) {
 	return CONF_ERROR;
 };
 
-int Configure::_parse_item(char*& src, conf_item* item) {
-	conf_item* node = new conf_item(ITEM);
-	_parse_key(src, node);
+int Configure::_parse_item(char*& src, ConfNode* item) {
+	ConfNode* node = new ConfNode(ITEM);
+	char token[CONF_LINE_NUM];
+	_parse_key(src, token);
+	node->set_key(token);
 	expect(src, ":");
 	node->set_father(item);
 	node->add_to_tree();
-	_parse_value(src, node);
+	_parse_value(src, token);
+	node->set_value(token);
 	if (*src == 0) {
 		return CONF_SUCC;
 	}	
 	return CONF_ERROR;
 };
 
-int Configure::_parse_array_item(char*& src, conf_item* item) {
-	conf_item* node = new conf_item(ARRAY_ITEM);
-	_parse_key(src, node);
+int Configure::_parse_array_root(char*& src, ConfNode* item) {
+	ConfNode* node = new ConfNode(ARRAY_ROOT);
+	char token[CONF_LINE_NUM];
+	_parse_key(src, token);
+	node->set_key(token);
 	expect(src, ":");
 	expect(src, "[");
 	node->set_father(item);
+	node->add_to_tree();
 	if (CONF_ERROR == _parse_array(src, node)) {
 		throw exception(MISSING, "parse array error");
 	}
@@ -262,19 +273,51 @@ int Configure::_parse_array_item(char*& src, conf_item* item) {
 	return CONF_ERROR;
 };
 
-int Configure::_parse_key(char*& src, conf_item* item) {
+int Configure::_parse_array(char*& src, ConfNode* item) {
 	if (NULL == src || NULL == item) {
 		return CONF_ERROR;
 	}
-	int ret = 0;
 	char token[CONF_LINE_NUM];
+	int element_cnt = 0;
+	while (get_token(src, token, CONF_LINE_NUM) > 0) {
+		ConfNode* tmp;
+		tmp = new ConfNode(ARRAY_ITEM);
+		tmp->set_value(token);
+		tmp->set_father(item);
+		tmp->add_to_tree();
+		expect(src, ",");
+		element_cnt++;
+	}
+	if (CONF_SUCC == expect(src, "]")) {
+		return CONF_SUCC;
+	}
+	if (0 == element_cnt) {
+		ConfNode* tmp = new ConfNode(ARRAY_ITEM);
+		tmp->set_value("NULL");
+		tmp->set_father(item);
+		tmp->add_to_tree();
+	}
+	if (*src == 0) {
+		char tmp[CONF_LINE_NUM];
+		if (true != get_next_line(tmp, CONF_LINE_NUM)) {
+			throw exception(UNEXPECTED, "unexpected end of array");
+		}
+		char* iter = tmp;
+		return _parse_array(iter, item->get_child());
+	}	
+	return CONF_ERROR;
+};
+int Configure::_parse_key(char*& src, char* token) {
+	if (NULL == src || NULL == token) {
+		return CONF_ERROR;
+	}
+	int ret = 0;
 	get_token(src, token, CONF_LINE_NUM);
-	item->set_key(token);
 	return ret;
 };
 
-int Configure::_parse_value(char*& src, conf_item* item) {
-	if (NULL == src || NULL == item) {
+int Configure::_parse_value(char*& src, char* token) {
+	if (NULL == src || NULL == token) {
 		return CONF_ERROR;
 	}
 	int src_len = strlen(src);
@@ -287,7 +330,6 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 	}
 
 	int ret = 0;
-	char token[CONF_LINE_NUM];
 	char* tmp = src + strlen(src) - 1;
 	while (*tmp == ' ' || *tmp == '\t') {
 		tmp--;
@@ -303,8 +345,6 @@ int Configure::_parse_value(char*& src, conf_item* item) {
 		}
 		token[ret] = 0;
 	}
-	item->set_value(token);
-	item->set_nodetype(ITEM);
 	return ret;
 };
 
@@ -347,54 +387,8 @@ int Configure::_regulate_value(char* token, char* src) {
 	*token = 0;
 };
 
-int Configure::_parse_array(char*& src, conf_item* item) {
-	if (NULL == src || NULL == item) {
-		return CONF_ERROR;
-	}
-	char token[CONF_LINE_NUM];
-	int element_cnt = 0;
-	while (get_token(src, token, CONF_LINE_NUM) > 0) {
-		conf_item* tmp;
-		if (0 == element_cnt) {
-			tmp = item;
-			tmp->set_value(token);
-		}
-		else {
-			tmp = new conf_item(item->get_key().c_str(), token);
-			tmp->set_father(item->get_father());
-		}
-		tmp->add_to_tree();
-		tmp->set_nodetype(ARRAY_ITEM);
-		expect(src, ",");
-		element_cnt++;
-	}
-	if (element_cnt == 0 && CONF_SUCC == expect(src, "]")) {
-		delete item;
-		return CONF_SUCC;
-	}
-	if (element_cnt == 0 && CONF_SUCC != expect(src, "]")) {
-		delete item;
-		throw exception(UNEXPECTED, "invalid empty line of array");
-	}
-	if (*src == 0) {
-		char tmp[CONF_LINE_NUM];
-		if (true != get_next_line(tmp, CONF_LINE_NUM)) {
-			throw exception(UNEXPECTED, "unexpected end of array");
-		}
-		char* iter = tmp;
-		conf_item* next_item = new conf_item;
-		next_item->set_key(item->get_key());
-		next_item->set_father(item);
-		return _parse_array(iter, next_item);
-	}	
-	if (*src == ']') {
-		expect(src, "]");
-		return CONF_SUCC;
-	}
-	return CONF_ERROR;
-};
 
-int Configure::expect(char*& src, const char*des) {
+int Configure::expect(char*& src, const char* des) {
 	if (NULL == src || des == NULL) {
 		return CONF_ERROR;
 	}
@@ -469,7 +463,7 @@ bool Configure::get_next_line(char* line, int length) {
 	return true;
 };
 
-int Configure::_release(conf_item* conf_tree) {
+int Configure::_release(ConfNode* conf_tree) {
 	if (NULL == conf_tree) {
 		return CONF_SUCC;
 	}
@@ -478,14 +472,15 @@ int Configure::_release(conf_item* conf_tree) {
 	return CONF_SUCC;
 };
 
-conf_item& Configure::operator[](const char* item) {
+ConfNode& Configure::operator[](const char* item) {
 	return (*_root)[item];
 }
-conf_item& Configure::operator[](int item) {
+
+ConfNode& Configure::operator[](int item) {
 	return (*_root)[item];
 };
 
-conf_item& Configure::operator[](const std::string item) {
+ConfNode& Configure::operator[](const std::string item) {
 	return operator[](item.c_str());
 };
 
@@ -498,7 +493,7 @@ bool Configure::has_key(const char* key) {
 };
 
 bool Configure::has_key(const std::string& key) {
-	return _root->has_key(key);
+	return _root->has_key(key.c_str());
 };
 
 bool Configure::has_key(int key) {

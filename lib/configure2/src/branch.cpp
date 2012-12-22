@@ -2,32 +2,40 @@
  * Copyright: zhaodongwei@nanjing university
  * author: zhaodongwei(joodaw@gmail.com)
  * 
- * file: trunk.cpp
- * date: 2012-12-21
- * desc: trunk node type
+ * file: branch.cpp
+ * date: 2012-12-22
+ * desc: branch node type
  ***********************************************************/
 
-#include "trunk.h" 
+#include "branch.h" 
 
 namespace configure {
 
-Trunk::~Trunk() {
-	if (NULL != _brother) {
-		delete _brother;
-		_brother = NULL;
-	}
-
+Branch::~Branch() {
 	if (NULL != _child) {
 		delete _child;
 		_child = NULL;
 	};
+
+	if (NULL != _brother) {
+		delete _brother;
+		_brother = NULL;
+	}
 };
 
-int Trunk::size() {
-	return 1;
+int Branch::size() {
+	ConfStruct* bro = get_brother();
+	int ret = 1;
+	while (bro != NULL) {
+		if ((!bro->get_key().compare(_key)) && BRANCH == bro->get_nodetype()) {
+			ret++;
+		}
+		bro = bro->get_brother();
+	}
+	return ret;
 };
 
-int Trunk::save(FILE* fs, int depth) {
+int Branch::save(FILE* fs, int depth) {
 	if (NULL == fs || depth < 0) {
 		throw exception(UNEXPECTED, "NULL fs ptr");
 	}
@@ -37,7 +45,7 @@ int Trunk::save(FILE* fs, int depth) {
 		fprintf(fs, ".");
 		i--;
 	}
-	fprintf(fs, "%s]\n", _key.c_str());
+	fprintf(fs, "@%s]\n", _key.c_str());
 	if (_child != NULL) {
 		_child->save(fs, depth + 1);
 	}
@@ -47,36 +55,54 @@ int Trunk::save(FILE* fs, int depth) {
 	return 0;
 };
 
-bool has_key(const char* key) {
+bool Branch::has_key(const char* key) {
 	return ConfStruct::has_key(key);
 };
 
-bool has_key(int key) {
-	return false;
+bool Branch::has_key(const std::string& key) {
+	return has_key(key.c_str());
 };
 
-Confstruct* operator[](const char* key) {
-	return ConfStruct::operator(key);
+bool Branch::has_key(int key) {
+	if (key < 0 || key >= size()) {
+		return false;
+	}
+	return true;
 };
 
-ConfStruct* operator[](int key) {
-	throw exception(UNEXPECTED, "no such key %d\n", key);
+ConfStruct* Branch::operator[](const char* key) {
+	return ConfStruct::operator[](key);
 };
 
-int to_int() {
-	throw exception(UNEXPECTED, "try to convert trunk");
+ConfStruct* Branch::operator[](int key) {
+	ConfStruct* bro = this;
+	int iter = 0;
+	while (bro != NULL && iter < key) {
+		if ((!bro->get_key().compare(_key)) && BRANCH == bro->get_nodetype()) {
+			iter++;
+		}
+		bro = bro->get_brother();
+	}
+	if (NULL == bro) {
+		throw exception(UNEXPECTED, "try to convert branch");
+	}
+	return bro;
 };
 
-double to_double() {
-	throw exception(UNEXPECTED, "try to convert trunk");
+int Branch::to_int() {
+	throw exception(UNEXPECTED, "try to convert branch");
 };
 
-const char* to_cstr() {
-	throw exception(UNEXPECTED, "try to convert trunk");
+double Branch::to_double() {
+	throw exception(UNEXPECTED, "try to convert branch");
 };
 
-std::string to_string() {
-	throw exception(UNEXPECTED, "try to convert trunk");
+const char* Branch::to_cstr() {
+	throw exception(UNEXPECTED, "try to convert branch");
+};
+
+std::string Branch::to_string() {
+	throw exception(UNEXPECTED, "try to convert branch");
 };
 
 };

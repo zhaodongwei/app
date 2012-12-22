@@ -47,35 +47,39 @@ int Trunk::save(FILE* fs, int depth) {
 	return 0;
 };
 
-bool has_key(const char* key) {
+bool Trunk::has_key(const char* key) {
 	return ConfStruct::has_key(key);
 };
 
-bool has_key(int key) {
+bool Trunk::has_key(const std::string& key) {
+	return has_key(key.c_str());
+};
+
+bool Trunk::has_key(int key) {
 	return false;
 };
 
-Confstruct* operator[](const char* key) {
-	return ConfStruct::operator(key);
+ConfStruct* Trunk::operator[](const char* key) {
+	return ConfStruct::operator[](key);
 };
 
-ConfStruct* operator[](int key) {
+ConfStruct* Trunk::operator[](int key) {
 	throw exception(UNEXPECTED, "no such key %d\n", key);
 };
 
-int to_int() {
+int Trunk::to_int() {
 	throw exception(UNEXPECTED, "try to convert trunk");
 };
 
-double to_double() {
+double Trunk::to_double() {
 	throw exception(UNEXPECTED, "try to convert trunk");
 };
 
-const char* to_cstr() {
+const char* Trunk::to_cstr() {
 	throw exception(UNEXPECTED, "try to convert trunk");
 };
 
-std::string to_string() {
+std::string Trunk::to_string() {
 	throw exception(UNEXPECTED, "try to convert trunk");
 };
 

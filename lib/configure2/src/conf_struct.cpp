@@ -40,12 +40,17 @@ int ConfStruct::init() {
 	_brother = NULL;
 	_father = NULL;
 	_node = INVALID;
-	_shadow = NULL;
 	_wrapper = NULL;
 	return 0;
 };
 
 ConfStruct::~ConfStruct() {
+	fprintf(stdout, "[%s]:[%s]\n", _key.c_str(), _value.c_str());
+	if (ROOT != get_nodetype()) {
+		if (NULL != _wrapper) {
+			delete _wrapper;
+		}
+	}
 };
 
 bool ConfStruct::add_to_tree() {

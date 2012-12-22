@@ -15,6 +15,7 @@
 #include <string>
 
 #include "conf_nodetype.h"
+#include "exception.h"
 
 namespace configure {
 
@@ -100,17 +101,6 @@ public:
 		return node_in;
 	};
 
-	int set_shadow(ConfStruct* src) {
-		if (NULL == src) {
-			return -1;
-		}
-		_shadow = src;
-		return 0;
-	};
-	ConfStruct* get_shadow() {
-		return _shadow;
-	};
-
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
 	
@@ -125,8 +115,8 @@ public:
 	virtual bool has_key(const std::string& key);
 	virtual bool has_key(int key);
 
-	virtual ConfStruct& operator[](const char* key);
-	virtual ConfStruct& operator[](int key);
+	virtual ConfStruct* operator[](const char* key);
+	virtual ConfStruct* operator[](int key);
 
 protected:
 	std::string _key;

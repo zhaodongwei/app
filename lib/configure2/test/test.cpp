@@ -17,8 +17,11 @@
 int main() {
 	configure::Configure conf(std::string("./conf/configure.conf"));
 	//conf.save("a");
-	fprintf(stdout, "array1: %s\n", conf["trunk"]["branch"]["array1"][1][0].get_key().c_str());
-	fprintf(stdout, "array2: %d\n", conf["trunk"]["branch"]["array2"].get_elder_brother()->to_int());
+	fprintf(stdout, "int: %lf\n", conf["trunk"]["branch"]["int"].to_double());
+	fprintf(stdout, "array1: %d\n", conf["trunk"]["branch"]["array1"][1][0].to_int());
+	fprintf(stdout, "array1 size: %d\n", conf["trunk"]["branch"]["array1"].size());
+	fprintf(stdout, "array1[0] size: %d\n", conf["trunk"]["branch"]["array1"][0].size());
+	fprintf(stdout, "array1[1] size: %d\n", conf["trunk"]["branch"]["array1"][1].size());
 	return 0;
 }
 

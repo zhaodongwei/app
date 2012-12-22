@@ -15,7 +15,8 @@
 #include <vector>
 #include <string>
 
-#include "conf_struct.h"
+#include "conf_nodetype.h"
+#include "conf_node.h"
 
 namespace configure {
 
@@ -27,9 +28,9 @@ class Configure {
 public:
 	Configure(const char* conf_file);
 	Configure(const std::string& conf_file);
-	conf_item& operator[](const char* item);
-	conf_item& operator[](const std::string item);
-	conf_item& operator[](int item);
+	ConfNode& operator[](const char* item);
+	ConfNode& operator[](const std::string item);
+	ConfNode& operator[](int item);
 	int reload();
 	int save(const char* conf_file);
 	int size();
@@ -41,30 +42,24 @@ public:
 private:
 	FILE* _fs;
 	std::string _file;
-	conf_item* _root;
-	std::vector<conf_item*> _layers;
+	ConfNode* _root;
+	std::vector<ConfNode*> _layers;
 	int _init(const char* conf_file);
 	nodetype _check_type(char* src);
-	int _parse_branch(char*& src, conf_item*& item);
-	int _parse_trunk(char*& src, conf_item*& item);
-	int _parse_item(char*& src, conf_item* item);
-	int _parse_array_item(char*& src, conf_item* item);
+	int _parse_branch(char*& src, ConfNode*& item);
+	int _parse_trunk(char*& src, ConfNode*& item);
+	int _parse_item(char*& src, ConfNode* item);
+	int _parse_array_root(char*& src, ConfNode* item);
 	int _get_layer(char*& src);
-	conf_item* _get_father_node(int layer);
-	int _set_father_node(int layer, conf_item* node);
-	int _show_layers() {
-		int i = 0;
-		for (; i < _layers.size(); i++) {
-			fprintf(stdout, "[layers]layer: %d,key: %s\n", i, _layers[i]->get_key().c_str());
-		}
-	};
+	ConfNode* _get_father_node(int layer);
+	int _set_father_node(int layer, ConfNode* node);
 
-	int _parse_key(char*& src, conf_item* item);
-	int _parse_value(char*& src, conf_item* item);
-	int _parse_array(char*& src, conf_item* item);
+	int _parse_key(char*& src, char* token);
+	int _parse_value(char*& src, char* token);
+	int _parse_array(char*& src, ConfNode* item);
 
 	int _parse();
-	int _release(conf_item* conf_tree);
+	int _release(ConfNode* conf_tree);
 	int expect(char*& src, const char* des);
 	int get_token(char*& src, char* token, int length);
 	bool is_alpha_number(const char* letter) {
@@ -78,7 +73,7 @@ private:
 		if (item >= '0' && item <= '9') {
 			return true;
 		}
-		if (item == '_') {
+		if (item == '_' || item == '.' || item == '+') {
 			return true;
 		}
 		return false;

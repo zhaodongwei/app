@@ -24,7 +24,7 @@ int Root::size() {
 
 int Root::save(FILE* fs, int depth) {
 	if (NULL == fs || depth != 0) {
-		throw exception(NEXPECTED, "NULL fs ptr");
+		throw exception(UNEXPECTED, "NULL fs ptr");
 	}
 	if (NULL == _child) {
 		return 0;
@@ -32,35 +32,39 @@ int Root::save(FILE* fs, int depth) {
 	return _child->save(fs, depth + 1);
 };
 
-bool has_key(const char* key) {
+bool Root::has_key(const char* key) {
 	return ConfStruct::has_key(key);
 };
 
-bool has_key(int key) {
+bool Root::has_key(const std::string& key) {
+	return has_key(key.c_str());
+};
+
+bool Root::has_key(int key) {
 	return false;
 };
 
-ConfStruct* operator[](const char* key) {
+ConfStruct* Root::operator[](const char* key) {
 	return ConfStruct::operator[](key);	
 };
 
-ConfStruct* operator[int key] {
-	throw exception(UNEXCEPTED, "no such key: %d", key);
+ConfStruct* Root::operator[](int key) {
+	throw exception(UNEXPECTED, "no such key: %d", key);
 };
 
-int to_int() {
+int Root::to_int() {
 	throw exception(UNEXPECTED, "try to convert root");
 };
 
-double to_double() {
+double Root::to_double() {
 	throw exception(UNEXPECTED, "try to convert root");
 };
 
-const char* to_cstr() {
+const char* Root::to_cstr() {
 	throw exception(UNEXPECTED, "try to convert root");
 };
 
-std::string to_string() {
+std::string Root::to_string() {
 	throw exception(UNEXPECTED, "try to convert root");
 };
 

@@ -16,7 +16,8 @@
 
 int main() {
 	configure::Configure conf(std::string("./conf/configure.conf"));
-	//conf.save("a");
+	//conf.save("a.conf");
+	fprintf(stdout, "extract values\n");
 	fprintf(stdout, "int: %lf\n", conf["trunk"]["branch"]["int"].to_double());
 	fprintf(stdout, "array1: %d\n", conf["trunk"]["branch"]["array1"][1][0].to_int());
 	fprintf(stdout, "array1 size: %d\n", conf["trunk"]["branch"]["array1"].size());

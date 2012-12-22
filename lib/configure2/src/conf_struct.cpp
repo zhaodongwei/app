@@ -45,7 +45,7 @@ int ConfStruct::init() {
 };
 
 ConfStruct::~ConfStruct() {
-	fprintf(stdout, "[%s]:[%s]\n", _key.c_str(), _value.c_str());
+	//fprintf(stdout, "[%s]:[%s]\n", _key.c_str(), _value.c_str());
 	if (ROOT != get_nodetype()) {
 		if (NULL != _wrapper) {
 			delete _wrapper;

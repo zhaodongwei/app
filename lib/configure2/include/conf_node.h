@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 #include "conf_struct.h"
 #include "conf_nodetype.h"
@@ -52,6 +53,7 @@ public:
 	double to_double();
 	const char* to_cstr();
 	std::string to_string();
+	static std::vector<ConfNode*> gc;
 
 private:
 	ConfStruct* _conf_factory(nodetype node);

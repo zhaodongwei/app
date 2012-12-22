@@ -11,15 +11,25 @@
 
 namespace configure {
 
+std::vector<ConfNode*> ConfNode::gc;
+
 ConfNode::ConfNode(nodetype node) {
 	_conf_ins = _conf_factory(node);
 	_conf_ins->set_wrapper(this);
+	gc.push_back(this);
 };
 
 ConfNode::~ConfNode() {
 	if (NULL != _conf_ins && ROOT == _conf_ins->get_nodetype()) {
 		delete _conf_ins;
 		_conf_ins = NULL;
+		std::vector<ConfNode*>::iterator iter;
+		for(iter = gc.begin() + 1; iter != gc.end(); iter++) {
+			if (NULL != *iter) {
+				delete (*iter);
+			}
+		}
+		gc.clear();
 	}
 };
 

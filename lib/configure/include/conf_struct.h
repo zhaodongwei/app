@@ -15,8 +15,11 @@
 #include <string>
 
 #include "conf_nodetype.h"
+#include "exception.h"
 
 namespace configure {
+
+class ConfNode;
 
 class ConfStruct {
 public:
@@ -25,6 +28,18 @@ public:
 	ConfStruct(nodetype node);
 	ConfStruct(const std::string& key, const std::string& value);
 	virtual ~ConfStruct();
+
+	int set_wrapper(ConfNode* pnode) {
+		if (NULL == pnode) {
+			throw exception(UNEXPECTED, "NULL wrapper ptr");
+		}
+		_wrapper = pnode;
+		return 0;
+	};
+
+	ConfNode* get_wrapper() {
+		return _wrapper;
+	}
 
 	std::string get_key() const {
 		return _key;
@@ -86,17 +101,6 @@ public:
 		return node_in;
 	};
 
-	int set_shadow(ConfStruct* src) {
-		if (NULL == src) {
-			return -1;
-		}
-		_shadow = src;
-		return 0;
-	};
-	ConfStruct* get_shadow() {
-		return _shadow;
-	};
-
 	bool add_to_tree();
 	ConfStruct* get_last_child() const;
 	
@@ -111,8 +115,8 @@ public:
 	virtual bool has_key(const std::string& key);
 	virtual bool has_key(int key);
 
-	virtual ConfStruct& operator[](const char* key);
-	virtual ConfStruct& operator[](int key);
+	virtual ConfStruct* operator[](const char* key);
+	virtual ConfStruct* operator[](int key);
 
 protected:
 	std::string _key;
@@ -122,7 +126,8 @@ protected:
 	ConfStruct* _brother;
 	ConfStruct* _elder_brother;
 	ConfStruct* _father;
-	ConfStruct* _shadow;
+	ConfNode* _wrapper;
+
 	int init();
 	
 	bool _is_number(char letter) {

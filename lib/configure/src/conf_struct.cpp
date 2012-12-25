@@ -40,22 +40,12 @@ int ConfStruct::init() {
 	_brother = NULL;
 	_father = NULL;
 	_node = INVALID;
-	_shadow = NULL;
+	_wrapper = NULL;
+	return 0;
 };
 
 ConfStruct::~ConfStruct() {
-	if (NULL != _child && SHADOW != _node) {
-		delete _child;
-		_child = NULL;
-	}
-	if (NULL != _brother && SHADOW != _node) {
-		delete _brother;
-		_brother = NULL;
-	}
-	if (NULL != _shadow) {
-		delete _shadow;
-		_shadow = NULL;
-	}
+	//fprintf(stdout, "[%s]:[%s]\n", _key.c_str(), _value.c_str());
 };
 
 bool ConfStruct::add_to_tree() {
@@ -161,7 +151,7 @@ const char* ConfStruct::to_cstr() {
 	return _value.c_str();
 };
 
-ConfStruct& ConfStruct::operator[](const char* key) {
+ConfStruct* ConfStruct::operator[](const char* key) {
 	ConfStruct* child = _child;
 	if (NULL == child) {
 		throw exception(UNEXPECTED, "no such key: %s", key);
@@ -177,93 +167,18 @@ ConfStruct& ConfStruct::operator[](const char* key) {
 	if (NULL == child) {
 		throw exception(UNEXPECTED, "no such key: %s", key);
 	}
-	return *ret;
+	return ret;
 };
 
-ConfStruct& ConfStruct::operator[](int key) {
+ConfStruct* ConfStruct::operator[](int key) {
 	if (key < 0) {
 		throw exception(UNEXPECTED, "no such key: %d", key);
-		return *this;
 	}
-	if (BRANCH == _node) {
-		ConfStruct* next = this;
-		int iter = 0;
-		while (next != NULL && iter < key) {
-			if (!_key.compare(next->get_key())) {
-				iter++;
-			}
-			next = next->get_brother();
-		}
-		if (next != NULL && key == iter) {
-			return *next;
-		}
-		else {
-			throw exception(UNEXPECTED, "no such key: %d", key);
-			return *this;
-		}
-	}
-	ConfStruct* next = this;
-	int iter = 0;
-	while (next != NULL && iter < key ) {
-		if (SHADOW != _node) {
-			next = next->get_child();
-		}
-		else {
-			next = next->get_brother();
-		}
-		iter++;
-	}
-	if (iter == key && NULL != next) {
-		if (SHADOW != _node) {
-			ConfStruct* tmp = next->get_shadow();
-			if (NULL != tmp) {
-				return *tmp;
-			}
-			tmp = new ConfStruct(SHADOW);
-			next->set_shadow(tmp);
-			tmp->set_key(next->get_key());
-			tmp->set_value(next->get_value());
-			tmp->set_brother(next->get_brother());
-			return *tmp;
-		}
-		else {
-			return *next;
-		}
-	}
-	else {
-		throw exception(UNEXPECTED, "no such key: %d", key);
-		return *this;
-	}
+	return this;
 };
 
 int ConfStruct::size() {
-	int ret = 1;
-	if (BRANCH == _node) {
-		ConfStruct* bro = _brother;
-		while (bro != NULL) {
-			if (BRANCH == bro->get_nodetype() && (!_key.compare(bro->get_key()))) {
-				ret++;
-			}
-			bro = bro->get_brother();
-		}
-	}
-	if (ARRAY_ITEM == _node || SHADOW == _node) {
-		if (_child != NULL) {
-			ConfStruct* tmp = _child;
-			while (NULL != tmp) {
-				ret++;
-				tmp = tmp->get_child();
-			}
-		}
-		else if (_brother != NULL) {
-			ConfStruct* tmp = _brother;
-			while (NULL != tmp) {
-				ret++;
-				tmp = tmp->get_brother();
-			}
-		}
-	}
-	return ret;
+	return 1;
 };
 
 bool ConfStruct::has_key(const char* key) {

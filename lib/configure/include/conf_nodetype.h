@@ -17,6 +17,7 @@ enum all_types{
 	TRUNK,
 	BRANCH,
 	ITEM,
+	ARRAY_ROOT,
 	ARRAY_ITEM,
 	SHADOW
 };

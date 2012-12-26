@@ -40,6 +40,7 @@ int Configure::_init(const char* conf_file) {
 		fclose(_fs);
 	}
 	_fs = NULL;
+	return 0;
 };
 
 int Configure::reload() {
@@ -157,6 +158,7 @@ int Configure::_parse() {
 			throw exception(UNEXPECTED, "unexpected conf contents: %s", line);
 		}
 	}
+	return 0;
 };
 
 int Configure::_get_layer(char*& src) {
@@ -384,6 +386,7 @@ int Configure::_regulate_value(char* token, char* src) {
 		}
 	}
 	*token = 0;
+	return 0;
 };
 
 
@@ -470,6 +473,9 @@ bool Configure::get_next_line(char* line, int length) {
 
 	if (line[len - 1] == '\n' || line[len -1] == '\r') {
 		line[len - 1] = 0;
+	}
+	if (len >= 2 && (line[len - 1] == '\n' || line[len -1] == '\r')) {
+		line[len - 2] = 0;
 	}
 	return true;
 };

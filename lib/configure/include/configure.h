@@ -73,7 +73,7 @@ private:
 		if (item >= '0' && item <= '9') {
 			return true;
 		}
-		if (item == '_' || item == '.' || item == '+') {
+		if (item == '-' || item == '.' || item == '+') {
 			return true;
 		}
 		return false;

@@ -19,4 +19,4 @@ lib: $(objects)
 	ar cqs libfeaana.a $(objects)
 
 clean:
-	rm $(objects) test.o feaana
+	rm $(objects) test.o feaana *.a

@@ -12,15 +12,6 @@
 namespace configure {
 
 Trunk::~Trunk() {
-	if (NULL != _brother) {
-		delete _brother;
-		_brother = NULL;
-	}
-
-	if (NULL != _child) {
-		delete _child;
-		_child = NULL;
-	};
 };
 
 int Trunk::size() {

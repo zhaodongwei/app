@@ -12,10 +12,6 @@
 namespace configure {
 
 Root::~Root() {
-	if (_child != NULL) {
-		delete _child;
-		_child = NULL;
-	}
 };
 
 int Root::size() {

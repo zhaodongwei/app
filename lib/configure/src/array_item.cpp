@@ -12,15 +12,6 @@
 namespace configure {
 
 ArrayItem::~ArrayItem() {
-	if (NULL != _child) {
-		delete _child;
-		_child = NULL;
-	};
-
-	if (NULL != _brother) {
-		delete _brother;
-		_brother = NULL;
-	}
 };
 
 int ArrayItem::size() {

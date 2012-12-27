@@ -12,10 +12,6 @@
 namespace configure {
 
 Item::~Item() {
-	if (NULL != _brother) {
-		delete _brother;
-		_brother = NULL;
-	}
 };
 
 int Item::size() {

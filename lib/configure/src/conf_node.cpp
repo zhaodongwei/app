@@ -31,6 +31,10 @@ ConfNode::~ConfNode() {
 		}
 		gc.clear();
 	}
+	else if (NULL != _conf_ins) {
+		fprintf(stdout, "[delete][%s][%s]\n", _conf_ins->get_key().c_str(), _conf_ins->get_value().c_str());
+		delete _conf_ins;
+	}
 };
 
 ConfStruct* ConfNode::_conf_factory(nodetype node) {

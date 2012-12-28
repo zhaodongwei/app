@@ -7,15 +7,15 @@
  * desc: head file of wordseg class
  ***********************************************************/
 
+#ifndef _WORDSEG_H_
+#define _WORDSEG_H_
+
 #include <stdio.h>
 #include <string>
 #include <vector>
 
 #include "zdict.h"
 #include "sign.h"
-
-#ifndef _WORDSEG_H_
-#define _WORDSEG_H_
 
 #define WORDSEG_SUCC 0
 #define WORDSEG_ERROR -1

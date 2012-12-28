@@ -9,10 +9,11 @@
 
 #include "funclib.h"
 
+/*
 bool F_GREATER_THAN(int lhs, int rhs) {
 	if (lhs > rhs) {
 		return true;
 	}
 	return false;
 };
-
+*/

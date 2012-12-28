@@ -41,6 +41,19 @@ unsigned int spliter_size() {
 	return ins->size();
 };
 
+int spliter_erase_newline(char* line) {
+	int len = strlen(line);
+	if (NULL == line || 0 == len) {
+		return SPLIT_SUCC;
+	}
+	for (int i = len - 1; i >= 0 && i > len - 3; i--) {
+		if (line[i] == '\n' || line[i] == '\r') {
+			line[i] = 0;
+		}
+	}
+	return SPLIT_SUCC;
+};
+
 Spliter* Spliter::_spliter;
 Spliter::SplitGarbage Spliter::_sg;
 
@@ -122,7 +135,6 @@ int Spliter::split(const char* line) {
 		_line_length = strlen(line) + 1;
 	}
 	strncpy(_line, line, strlen(line) + 1);
-	fprintf(stdout, "split now, seg[%s], line[%s]\n", _seg, line);
 	_idx.clear();
 	_idx.push_back(0);
 	char* tmp = _line;

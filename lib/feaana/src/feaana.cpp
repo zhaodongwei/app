@@ -9,6 +9,7 @@
 
 #include "exception.h"
 #include "feaana.h"
+#include "spliter.h"
 
 namespace feaana {
 
@@ -33,6 +34,8 @@ int Feaana::reg(const char* pfile) {
 		_fs = NULL;
 	}
 
+	_fname.clear();
+	_fname.append(pfile);
 	_fs = fopen(pfile, "r");
 	if (NULL == _fs) {
 		throw exception(NOT_EXIST, "open file %s fail", pfile);
@@ -42,6 +45,16 @@ int Feaana::reg(const char* pfile) {
 };
 
 int Feaana::filter(int pos, bool (*func)(int, int), int arg) {
+	freopen(_fname.c_str(), "r", _fs);
+	const int LINE_LENGTH = 1024;
+	char line[LINE_LENGTH];
+	while (NULL != fgets(line, LINE_LENGTH, _fs)) {
+		spliter_erase_newline(line);
+		spliter_split(line, "\t");
+		char tmp[LINE_LENGTH];
+		spliter_at(3, tmp);
+		fprintf(stdout, "[%s]\n", tmp);
+	}
 	int tmp = 10000;
 	if (func(tmp, arg)) {
 		fprintf(stdout, "%d\t%d\t%d\n", pos, tmp, arg);

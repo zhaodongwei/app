@@ -27,6 +27,8 @@ int spliter_split(const char* line);
 int spliter_at(int pos, char* des);
 unsigned int spliter_size();
 
+int spliter_erase_newline(char* line);
+
 class Spliter {
 
 public:

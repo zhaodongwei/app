@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "funclib.h"
 
@@ -27,6 +28,7 @@ public:
 
 private:
 	FILE* _fs;
+	std::string _fname;
 
 };
 

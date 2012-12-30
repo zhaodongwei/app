@@ -48,6 +48,50 @@ ConfStruct::~ConfStruct() {
 	//fprintf(stdout, "[%s]:[%s]\n", _key.c_str(), _value.c_str());
 };
 
+int ConfStruct::_save_value(FILE* fs) {
+	if (NULL == fs) {
+		return -1;		
+	}
+	bool is_need_include = false;
+	for (int i = 0; i < _value.size(); i++) {
+		char c = _value[i];
+		if (c == '\n' || c == '\r' || c == '\t'
+		    || c == '\"' || c == '\\' ) {
+			is_need_include = true;
+			break;
+		}
+	}
+	if (is_need_include) {
+		fprintf(fs, "\"");
+	}
+	for (int i = 0; i < _value.size(); i++) {
+		char c = _value[i];
+		switch(c) {
+			case '\n':
+				fprintf(fs, "\\n");
+				break;
+			case '\r':
+				fprintf(fs, "\\r");
+				break;
+			case '\t':
+				fprintf(fs, "\\t");
+				break;
+			case '\"':
+				fprintf(fs, "\\\"");
+				break;
+			case '\\':
+				fprintf(fs, "\\\\");
+				break;
+			default:
+				fprintf(fs, "%c", c);
+		}
+	}
+	if (is_need_include) {
+		fprintf(fs, "\"");
+	}
+	return 0;
+};
+
 bool ConfStruct::add_to_tree() {
 	if (NULL == _father) {
 		return false;

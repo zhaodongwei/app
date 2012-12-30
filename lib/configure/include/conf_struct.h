@@ -138,6 +138,7 @@ protected:
 	};
 	double _get_number(std::string& str, int& iter);
 	double _parse_number();
+	int _save_value(FILE* fs);
 };
 
 typedef ConfStruct conf_item;

@@ -22,7 +22,9 @@ int Item::save(FILE* fs, int depth) {
 	if (NULL == fs || depth < 0) {
 		throw exception(UNEXPECTED, "NULL fs ptr");
 	}
-	fprintf(fs, "%s : %s\n", _key.c_str(), _value.c_str());
+	fprintf(fs, "%s : ", _key.c_str());
+	_save_value(fs);
+	fprintf(fs, "\n");
 	if (NULL != _brother) {
 		_brother->save(fs, depth);
 	}

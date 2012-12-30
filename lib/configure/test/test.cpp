@@ -24,6 +24,7 @@ int main() {
 	fprintf(stdout, "array1 size: %d\n", conf["trunk"]["branch"]["array1"].size());
 	fprintf(stdout, "array1[0] size: %d\n", conf["trunk"]["branch"]["array1"][0].size());
 	fprintf(stdout, "array1[1] size: %d\n", conf["trunk"]["branch"]["array1"][1].size());
+
 	return 0;
 }
 

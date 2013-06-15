@@ -30,6 +30,6 @@ echo $$ >${lock_file}
 # do your work
 echo "work start"
 sleep 10
-echo "work begin"
+echo "work end"
  
 at_exit

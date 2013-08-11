@@ -24,6 +24,11 @@ int main() {
 	fprintf(stdout, "array1 size: %d\n", conf["trunk"]["branch"]["array1"].size());
 	fprintf(stdout, "array1[0] size: %d\n", conf["trunk"]["branch"]["array1"][0].size());
 	fprintf(stdout, "array1[1] size: %d\n", conf["trunk"]["branch"]["array1"][1].size());
+	fprintf(stdout, "array3 size: %d\n", conf["trunk"]["branch"]["array3"].size());
+	fprintf(stdout, "array3[0] size: %d\n", conf["trunk"]["branch"]["array3"][0].size());
+	fprintf(stdout, "array3[0] value: %d\n", conf["trunk"]["branch"]["array3"][0].to_int());
+	fprintf(stdout, "array3[1] value: %d\n", conf["trunk"]["branch"]["array3"][1].to_int());
+	fprintf(stdout, "array3[2] value: %d\n", conf["trunk"]["branch"]["array3"][2].to_int());
 
 	return 0;
 }

@@ -41,7 +41,3 @@ lib : $(objects)
 
 clean:
 	rm test.o $(objects) configure libconfigure.a
-
-
-
-

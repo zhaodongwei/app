@@ -58,8 +58,18 @@ ConfStruct* ArrayRoot::operator[](const char* key) {
 };
 
 ConfStruct* ArrayRoot::operator[](int key) {
-	int iter = 0;
+    int depth = 0;
 	ConfStruct* child = _child;
+    while (NULL != child) {
+        depth++;
+        child = child->get_child();
+    }
+    if (1 == depth) {
+        return (*_child)[key];
+    }
+
+	int iter = 0;
+    child = _child;
 	while (NULL != child && iter < key) {
 		iter++;
 		child = child->get_child();

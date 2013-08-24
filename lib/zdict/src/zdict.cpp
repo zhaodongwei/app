@@ -7,6 +7,8 @@
  * desc: src file of zdict
  ***********************************************************/
 
+#include <map>
+
 #include "zdict.h"
 
 namespace zdict {

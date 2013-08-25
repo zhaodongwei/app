@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # file : zmake
-# des : zmake file, python script
+# des : zmake, help building your works
 # author : zhaodongwei (joodaw@gmail.com)
 # org : nju
 
@@ -69,20 +69,21 @@ GXX_FLAG('-O 2')
 OUTPUT_DIR('output')
 
 #config lib
-lib('app/lib/zlog')
+lib('app/lib/zlib')
 
 #head file
 header = './include/*'
 src = './src/*'
 
 app('exe', 'name', src, header)
-app('static', 'libname.a', src, header)
+#app('static', 'libname.a', src, header)
 """
 	)
 	f.close()
 
 # Makefile related
 def generate_Makefile():
+	global com_flag
 	try:
 		execfile('ZMAKE')
 	except:
@@ -104,6 +105,7 @@ def generate_Makefile():
 	make_clean(makefile)
 	makefile.close()
 	print 'Makefile made'
+	return 0
 
 def COMPLIER(complier_item):
 	global complier
@@ -128,12 +130,13 @@ def OUTPUT_DIR(output_dir_item):
 		except:
 			print 'I cannot make output dir'
 			return 7
+	return 0
 
 def root(working_path):
 	print working_path
 	root_list.append(working_path)
 
-def	lib(lib_path):
+def lib(lib_path):
 	print lib_path
 	lib_list.append(lib_path)
 
@@ -157,6 +160,7 @@ def make_obj_include(makefile_handler):
 		lib_name = it[:].split('/')[-1]
 		makefile_handler.write(root_path + it[:] + '/lib' + lib_name + '.a \\\n')
 	makefile_handler.write('-lpthread\n')
+	return 0
 
 def make_obj(makefile_handler):
 	for it in app_list:
@@ -202,6 +206,7 @@ def make_src(src_file, header_dict, header_path, makefile_handler):
 	makefile_handler.write('-c -o ' + output_dir + tmp_list_2[0] + '.o' \
        + ' ' + src_file + ' ' + header_path  + ' ' + '$(lib_header)');
 	src_set.add(src_file);
+	return 0
 
 def make_target(makefile_handler, app_name):
 	makefile_handler.write(app_name[1] + ':')
@@ -230,6 +235,7 @@ def make_clean(makefile_handler):
 		if ('exe' == it[0]):
 			makefile_handler.write(it[1] + ' ')
 	makefile_handler.write('\n')
+	return 0
 
 def print_src_header(makefile_handler, fname, header_dict):
 	f = open(fname, 'r');
@@ -256,6 +262,7 @@ def print_src_header(makefile_handler, fname, header_dict):
 			makefile_handler.write(header_dict[header] + ' ')
 	makefile_handler.write('\n')
 	f.close()	
+	return 0
 
 # arg parser and control
 arg_has_s = 0

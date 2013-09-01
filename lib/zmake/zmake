@@ -118,24 +118,6 @@ def find_git_path():
 		i += 1
 	return git
 
-	abs_path = os.path.abspath('.')
-	start = 0
-	pidx = 0
-	idx = 0
-	while (True):
-		pidx = idx
-		idx = abs_path.find('/', start)
-		if (idx == -1):
-			err('find_git_err')
-			return 1
-		git_path = abs_path[0:idx] + '/.git'
-		if (os.path.exists(git_path)):
-			break
-		start = idx + 1
-
-	git_path = abs_path[0:pidx]
-	return git_path
-
 def find_this_lib_path():
 	abs_path = os.path.abspath('.')
 	start = 0
@@ -299,7 +281,7 @@ def app(make_type, make_name, make_src, make_header):
 	app_list.append([make_type, make_name, make_src, make_header])
 
 def make_common(makefile_handler):
-	root_path = root_list[0] + '/'
+	root_path = root_list[0]
 	makefile_handler.write('all: ')
 	app_target = set()
 	for it in app_list:

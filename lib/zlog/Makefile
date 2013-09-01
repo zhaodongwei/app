@@ -2,11 +2,11 @@
 
 .PHONY: all
 all: zlog libzlog.a 
-lib_header=-I ../../..//app/lib/configure/include \
--I ../../..//app/lib/exception/include \
+lib_header=-I ../../../app/lib/configure/include \
+-I ../../../app/lib/exception/include \
 
-lib_library=../../..//app/lib/configure/libconfigure.a \
-../../..//app/lib/exception/libexception.a \
+lib_library=../../../app/lib/configure/libconfigure.a \
+../../../app/lib/exception/libexception.a \
 -lpthread
 
 zlog.o: ./src/zlog.cpp ./include/zlog.h 

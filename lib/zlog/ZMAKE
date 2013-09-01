@@ -16,7 +16,6 @@ LINK_FLAG('-lpthread')
 OUTPUT_DIR('output')
 
 #config lib
-lib('app/lib/exception')
 lib('app/lib/configure')
 
 #include folders
@@ -24,8 +23,8 @@ include('./include')
 
 #head file
 header = './include/*'
-src = './src/*,./test/*'
-src_lib = './src/*'
+src = './src/*'
+src_exe = './src/*,./test/*'
 
-app('exe', 'zlog', src, header)
-app('static', 'libzlog.a', src_lib, header)
+app('exe', 'zlog', src_exe, header)
+app('static', 'libzlog.a', src, header)

@@ -2,9 +2,9 @@
 
 .PHONY: all
 all: config libconfigure.a 
-lib_header=-I /home/zhaodw/project/app/lib/exception/include \
+lib_header=-I ../../..//app/lib/exception/include \
 
-lib_library=/home/zhaodw/project/app/lib/exception/libexception.a \
+lib_library=../../..//app/lib/exception/libexception.a \
 -lpthread
 
 configure.o: ./src/configure.cpp ./include/configure.h ./include/conf_nodetype.h 

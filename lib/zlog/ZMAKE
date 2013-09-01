@@ -17,6 +17,7 @@ OUTPUT_DIR('output')
 
 #config lib
 lib('app/lib/exception')
+lib('app/lib/configure')
 
 #include folders
 include('./include')
@@ -26,5 +27,5 @@ header = './include/*'
 src = './src/*,./test/*'
 src_lib = './src/*'
 
-app('exe', 'config', src, header)
-app('static', 'libconfigure.a', src_lib, header)
+app('exe', 'zlog', src, header)
+app('static', 'libzlog.a', src_lib, header)

@@ -4,16 +4,16 @@
 root('../../../')
 
 #complier
-COMPLIER('g++')
+complier('g++')
 
 #gxx flag
-GXX_FLAG('-O2')
+gxx_flag('-O2')
 
 #link flag
-LINK_FLAG('-lpthread')
+link_flag('-lpthread')
 
 #output dir
-OUTPUT_DIR('output')
+output_dir('output')
 
 #config lib
 #lib('app/lib/zlib')

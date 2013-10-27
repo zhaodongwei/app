@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "zlog.h"
 
@@ -21,6 +22,7 @@ int main() {
 		zlog(ZWARNNING, "warnning log");
 		zlog(ZFATAL, "fatal log");
 	}
+    //sleep(1);
 	zlog_close();
 	return 0;
 }

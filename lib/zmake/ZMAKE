@@ -7,7 +7,7 @@ root('../../../')
 COMPLIER('g++')
 
 #gxx flag
-GXX_FLAG('-O2')
+GXX_FLAG('-g -Wall')
 
 #link flag
 LINK_FLAG('-lpthread')

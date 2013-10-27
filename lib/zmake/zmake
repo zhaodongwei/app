@@ -21,10 +21,10 @@ target_list = []
 lib_map     = {}
 
 complier = 'gcc'
-gxx_flag = '-O2'
-gpp_flag = ''
+gxx_flags = '-g -Wall'
+gpp_flags = ''
 com_flag = ''
-link_flag  = ''
+link_flags  = ''
 output_dir = ''
 
 def usage():
@@ -70,16 +70,16 @@ def generate_ZMAKE():
 	f.write(
 """
 #complier
-COMPLIER('g++')
+complier('g++')
 
 #gxx flag
-GXX_FLAG('-O2')
+gxx_flag('-g -Wall')
 
 #link flag
-LINK_FLAG('-lpthread')
+link_flag('-lpthread')
 
 #output dir
-OUTPUT_DIR('output')
+output_dir('output')
 
 #config lib
 lib('app/lib/zlib')
@@ -93,6 +93,8 @@ src = './src/*'
 
 app('exe', 'name', src, header)
 #app('static', 'libname.a', src, header)
+
+#target('install', DEPEND(''), PHONY(false), SHELLCMD('cp name /usr/bin/'))
 """
 	)
 	f.close()
@@ -212,9 +214,9 @@ def generate_Makefile():
 		err('exec_zmake_err')
 		return 1
 	if (complier == 'gcc'):
-		com_flag = gxx_flag
+		com_flag = gxx_flags
 	elif (complier == 'g++'):
-		com_flag = gxx_flag + gpp_flag
+		com_flag = gxx_flags + gpp_flags
 	else:
 		err('complier_err', complier)
 		return 1
@@ -239,23 +241,23 @@ def generate_Makefile():
 	makefile.close()
 	return 0
 
-def COMPLIER(complier_item):
+def complier(complier_item):
 	global complier
 	complier = complier_item.lower()
 
-def GXX_FLAG(gxx_flag_item):
-	global gxx_flag
-	gxx_flag = gxx_flag_item
+def gxx_flag(gxx_flag_item):
+	global gxx_flags
+	gxx_flags = gxx_flag_item
 
-def GPP_FLAG(gpp_flag_item):
-	global gpp_flag
-	gpp_flag = gpp_flag_item
+def gpp_flag(gpp_flag_item):
+	global gpp_flags
+	gpp_flags = gpp_flag_item
 
-def LINK_FLAG(flag):
-	global link_flag
-	link_flag = flag
+def link_flag(flag):
+	global link_flags
+	link_flags = flag
 
-def OUTPUT_DIR(output_dir_item):
+def output_dir(output_dir_item):
 	global output_dir
 	output_dir = output_dir_item + '/'
 	if (os.path.exists(output_dir)):
@@ -296,7 +298,7 @@ def make_common(makefile_handler):
 	for it in lib_list:
 		lib_name = it[:].split('/')[-1]
 		makefile_handler.write(root_path + it[:] + '/lib' + lib_name + '.a \\\n')
-	makefile_handler.write(link_flag + '\n\n')
+	makefile_handler.write(link_flags + '\n\n')
 	return 0
 
 def make_content(makefile_handler):

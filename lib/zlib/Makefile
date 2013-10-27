@@ -22,7 +22,7 @@ md5app.o : src/md5app.cpp include/*
 lib : zlib.o sign.o md5.o
 	ar cqs libzlib.a zlib.o sign.o md5.o
 
-install:
+install: md5app
 	sudo cp md5 /usr/bin/
 
 clean:

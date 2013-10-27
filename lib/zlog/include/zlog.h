@@ -11,6 +11,10 @@
 #define _ZLOG_H_
 
 #include <stdio.h>
+#include <vector>
+#include <deque>
+#include <pthread.h>
+#include <unistd.h>
 
 #define ZLOG_SUCC 0
 #define ZLOG_ERROR -1
@@ -22,6 +26,16 @@ enum LOG_TYPE {
 	ZFATAL
 };
 typedef enum LOG_TYPE zlogtype;
+
+static std::vector<char*> _pool;
+static std::deque<char*> _task;
+static char* pmem;
+static pthread_t tid;
+static int _max_task_num;
+static int _max_task_length;
+static pthread_cond_t qready;
+static pthread_mutex_t qlock;
+static pthread_mutex_t task_lock;
 
 int zlog(zlogtype type, const char* format, ...);
 int zlog_load(const char* path);
@@ -37,13 +51,13 @@ public:
 	static ZLog* get_instance(const char* path);
 	int write_log(zlogtype type, const char* info);
 	int write_log(const char* info);
+	bool show(zlogtype type);
 	~ZLog();
 
 private:
 	ZLog(const char* path);
 	ZLog();
 	int _write_type(zlogtype type, char* line);
-	bool _show(zlogtype type);
 	int _create_pool();
 	FILE* _fs;
 	int _log_level;
@@ -55,6 +69,10 @@ private:
 				delete _pzlog;
 				_pzlog = NULL;
 			}
+            int cnt = 10;
+            while (_task.size() != 0 && cnt--) {
+                usleep(10);
+            }
 		}
 	};
 	static ZGarbage _z_garbage;

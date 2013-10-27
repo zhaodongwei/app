@@ -11,11 +11,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <vector>
-#include <deque>
 
 #include "exception.h"
 #include "configure.h"
@@ -24,21 +21,14 @@
 ZLog* ZLog::_pzlog;
 ZLog::ZGarbage ZLog::_z_garbage;
 
-std::vector<char*> _pool;
-std::deque<char*> _task;
-char* pmem;
-pthread_t tid;
-int _max_task_num;
-int _max_task_length;
-pthread_cond_t qready;
-pthread_mutex_t qlock;
-pthread_mutex_t task_lock;
-
 int zlog(zlogtype type, const char* format, ...) {
+	ZLog* ins = ZLog::get_instance();
+    if (!ins->show(type)) {
+        return ZLOG_SUCC;
+    }
 	va_list va;
 	va_start(va, format);
 	vsnprintf(pmem, _max_task_length, format, va);
-	ZLog* ins = ZLog::get_instance();
 	ins->write_log(type, pmem);
 	return ZLOG_SUCC;
 };
@@ -203,9 +193,6 @@ int ZLog::_write_type(zlogtype type, char* line) {
 };
 
 int ZLog::write_log(zlogtype type, const char* info) {
-	if (!_show(type)) {
-		return ZLOG_SUCC;
-	}
 	char* tmp;
 	pthread_mutex_lock(&qlock);
 	if (0 == _pool.size()) {
@@ -239,7 +226,7 @@ int ZLog::write_log(const char* info) {
 	return write_log(ZNOTICE, info); 
 };
 
-bool ZLog::_show(zlogtype type) {
+bool ZLog::show(zlogtype type) {
 	bool ret = false;
 	int i = (int)ZFATAL - (int)type;
 	if (_log_level & (1 << i)) {

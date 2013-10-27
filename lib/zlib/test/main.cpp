@@ -13,7 +13,7 @@ int main() {
 		char line[1024];
 		char seg[1024];
 		while (NULL != fgets(line, 1024, file)) {
-			fprintf(stdout, "%d, %s", strlen(line), line);
+			fprintf(stdout, "%lu, %s", strlen(line), line);
 			const char* p = zlib::seg_sentence(line, "\t", seg, 2);
 			if (NULL != p) {
 				fprintf(stdout, "seg: %s\n", seg);
@@ -23,10 +23,10 @@ int main() {
 		}
 	}
 
-	fprintf(stdout, "length of int: %d\n", sizeof(int));
-	fprintf(stdout, "length of short: %d\n", sizeof(short));
-	fprintf(stdout, "length of long: %d\n", sizeof(long));
-	fprintf(stdout, "length of long long: %d\n", sizeof(long long));
+	fprintf(stdout, "length of int: %lu\n", sizeof(int));
+	fprintf(stdout, "length of short: %lu\n", sizeof(short));
+	fprintf(stdout, "length of long: %lu\n", sizeof(long));
+	fprintf(stdout, "length of long long: %lu\n", sizeof(long long));
 	zint64 sign1, sign2;
 	create_sign(sign1, sign2, "caoyangzhaodongwei");
 	fprintf(stdout, "sign for %s\n", "caoyangzhaodongwei");
